@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project-module
+  type="WEB"
+  name="up6"
+  id="myeclipse.1554945519727"
+  context-root="/up6"
+  j2ee-spec="5.0"
+  archive="up6.war">
+  <attributes>
+    <attribute name="webrootdir" value="WebRoot" />
+  </attributes>
+</project-module>
+
