@@ -1,4 +1,4 @@
-package down2.biz;
+package down2.model;
 
 public class DnFileInf extends  up6.model.FileInf
 {

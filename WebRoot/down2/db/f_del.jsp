@@ -1,5 +1,6 @@
 <%@ page language="java" import="java.util.*" pageEncoding="UTF-8"%><%@ 
 	page contentType="text/html;charset=UTF-8"%><%@ 
+	page import="up6.*" %><%@
 	page import="down2.biz.*" %><%@
 	page import="down2.model.*" %><%@ 
 	page import="java.net.URLDecoder" %><%@ 
@@ -29,5 +30,6 @@ if (	StringUtils.isEmpty(uid)
 	out.write(cbk + "({\"value\":null})");
 	return;
 }
-DnFile.Delete(fid,Integer.parseInt(uid) );
+DBConfig db = new DBConfig();
+db.down().Delete(fid,Integer.parseInt(uid) );
 out.write(cbk+"({\"value\":1})");%>

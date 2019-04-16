@@ -1,5 +1,6 @@
 <%@ page language="java" import="java.util.*" pageEncoding="UTF-8"%><%@ 
 	page contentType="text/html;charset=UTF-8"%><%@ 
+	page import="up6.*" %><%@
 	page import="down2.biz.*" %><%/*
 	此页面主要用来向数据库添加一条记录。
 	一般在 HttpUploader.js HttpUploader_MD5_Complete(obj) 中调用
@@ -9,5 +10,6 @@
 String path = request.getContextPath();
 String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.getServerPort()+path+"/";
 
-DnFile.Clear();
+DBConfig db = new DBConfig();
+db.down().Clear();
 %>

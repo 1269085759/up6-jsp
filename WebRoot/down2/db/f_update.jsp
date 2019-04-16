@@ -35,6 +35,6 @@ if (StringUtils.isEmpty(uid)
 	return;
 }
 
-DnFile db = new DnFile();
-db.process(fid,Integer.parseInt(uid),lenLoc,per);
+DBConfig db = new DBConfig();
+db.down().process(fid,Integer.parseInt(uid),lenLoc,per);
 out.write(cbk + "({\"value\":1})");%>

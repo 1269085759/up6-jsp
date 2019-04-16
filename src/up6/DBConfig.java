@@ -6,6 +6,11 @@ import java.sql.SQLException;
 
 import org.apache.commons.lang.StringUtils;
 
+import down2.biz.DnFile;
+import down2.biz.DnFileMySQL;
+import down2.biz.DnFileOracle;
+import down2.biz.DnFileSQL;
+
 /**
  * 数据库配置类
  * 
@@ -64,6 +69,14 @@ public class DBConfig {
 		else if( StringUtils.equals(this.db, "mysql") ) return new DBFileMySQL();
 		else if( StringUtils.equals(this.db, "oracle") ) return new DBFileOracle();
 		else return new DBFile();
+	}
+	
+	public DnFile down() {
+		if( StringUtils.equals(this.db, "sql") ) return new DnFileSQL();
+		else if( StringUtils.equals(this.db, "mysql") ) return new DnFileMySQL();
+		else if( StringUtils.equals(this.db, "oracle") ) return new DnFileOracle();
+		else return new DnFile();		
+		
 	}
 	
 	public Connection getCon() 

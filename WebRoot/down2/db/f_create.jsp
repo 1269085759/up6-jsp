@@ -51,8 +51,8 @@ inf.lenSvr = Long.parseLong(lenSvr);
 inf.sizeSvr = sizeSvr;
 inf.fdTask = fdTask == "1";
 
-DnFile db = new DnFile();
-db.Add(inf);
+DBConfig db = new DBConfig();
+db.down().Add(inf);
 
 Gson gson = new Gson();
 String json = gson.toJson(inf);
