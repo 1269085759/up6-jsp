@@ -53,14 +53,14 @@ function DownloaderMgr()
 		, "FilePart"	: 5242880//文件块大小，计算器：http://www.beesky.com/newsite/bit_byte.htm
         , "FolderClear"	: true//下载前是否清空目录
         //file
-        , "UrlCreate"   : "http://localhost:8080/Uploader6.3MySQL/down2/db/f_create.jsp"
-        , "UrlDel"      : "http://localhost:8080/Uploader6.3MySQL/down2/db/f_del.jsp"
-        , "UrlList"     : "http://localhost:8080/Uploader6.3MySQL/down2/db/f_list.jsp"
-        , "UrlListCmp"  : "http://localhost:8080/Uploader6.3MySQL/down2/db/f_list_cmp.jsp"
-        , "UrlUpdate"   : "http://localhost:8080/Uploader6.3MySQL/down2/db/f_update.jsp"
-        , "UrlDown"     : "http://localhost:8080/Uploader6.3MySQL/down2/db/f_down.jsp"
+        , "UrlCreate"   : "http://localhost:8080/up6/down2/db/f_create.jsp"
+        , "UrlDel"      : "http://localhost:8080/up6/down2/db/f_del.jsp"
+        , "UrlList"     : "http://localhost:8080/up6/down2/db/f_list.jsp"
+        , "UrlListCmp"  : "http://localhost:8080/up6/down2/db/f_list_cmp.jsp"
+        , "UrlUpdate"   : "http://localhost:8080/up6/down2/db/f_update.jsp"
+        , "UrlDown"     : "http://localhost:8080/up6/down2/db/f_down.jsp"
 	    //folder
-        , "UrlFdData"   : "http://localhost:8080/Uploader6.3MySQL/down2/db/fd_data.jsp"
+        , "UrlFdData"   : "http://localhost:8080/up6/down2/db/fd_data.jsp"
         //x86
         , ie: {
               part: { clsid: "6528602B-7DF7-445A-8BA0-F6F996472569", name: "Xproer.DownloaderPartition" }
