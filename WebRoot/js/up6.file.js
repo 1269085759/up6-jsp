@@ -3,7 +3,7 @@ function FileUploader(fileLoc, mgr)
 {
     var _this = this;
     this.id = fileLoc.id;
-    this.ui = { msg: null, process: null, percent: null, btn: { del: null, cancel: null,post:null,stop:null }, div: null, split: null };
+    this.ui = { msg: null, process: null, percent: null, btn: { del: null, cancel: null,post:null,stop:null }, div: null};
     this.isFolder = false; //不是文件夹
     this.app = mgr.app;
     this.Manager = mgr; //上传管理器指针
@@ -305,8 +305,8 @@ function FileUploader(fileLoc, mgr)
     //删除，一般在用户点击"删除"按钮时调用
     this.remove = function ()
     {
+        this.Manager.del_file(this.fileSvr.id);
         this.app.delFile(this.fileSvr);
         this.ui.div.remove();
-        this.ui.split.remove();
     };
 }

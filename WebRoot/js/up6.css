@@ -7,8 +7,6 @@ a:hover{ color:#004477; text-decoration:underline; }
 
 /*文件上传列表*/
 .file-post-view{background-color: #FFF;font:12px/12px 宋体,新宋体;/*防目外部样式破坏*/overflow-x:hidden;overflow-y:scroll;}
-/*细线*/
-.file-line{background-color: #E3E6EB;overflow: hidden;display: none;height: 1px;}
 /*新构架*/
 div.top-space{margin:3px 0 0 0;}
 div.lineSpace{margin:10px 0 0 0;}
@@ -17,7 +15,15 @@ div.UploaderItemRight{width:54px; float:left;margin:3px 0 0 0;}
 /*文件信息*/
 .FileInfo{}
 /*文件名称*/
-.file-item{font:12px/12px 新宋体;background-color: #FFFFFF; height:65px; margin:0;padding:0 0 0 2px; display:none;}
+.file-item {
+    font: 12px/12px 新宋体;
+    background-color: #FFFFFF;
+    height: 65px;
+    margin: 0;
+    padding: 0 0 0 2px;
+    display: none;
+    border-bottom: 1px solid #E3E6EB;
+}
 .file-item-single{width:417px;}
 .file-item .name{font:bold 12px/20px 新宋体;width:180px; height:20px; float:left; overflow:hidden; text-overflow: ellipsis;overflow: hidden;white-space: nowrap; vertical-align:middle;}
 /*文件大小*/

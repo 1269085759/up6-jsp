@@ -34,7 +34,7 @@ public class DBFile {
 		sb.append(",f_complete");
 		sb.append(",f_pathSvr");//fix(2015-03-16):修复无法续传文件的问题。
 		sb.append(" from up6_files ");//change(2015-03-18):联合查询文件夹数据
-		sb.append(" where f_uid=? and f_deleted=0 and f_fdChild=0 and f_complete=0");//fix(2015-03-18):只加载未完成列表
+		sb.append(" where f_uid=? and f_deleted=0 and f_fdChild=0 and f_complete=0 and f_scan=0");//fix(2015-03-18):只加载未完成列表
 
 		ArrayList<FileInf> files = new ArrayList<FileInf>();
 		DbHelper db = new DbHelper();

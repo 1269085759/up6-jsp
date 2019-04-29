@@ -1,4 +1,4 @@
-var up6_app = {
+var down2_app = {
     ins: null
     ,edgeApp: null
     , Config: null

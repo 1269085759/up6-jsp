@@ -85,7 +85,7 @@ function DownloaderMgr()
         , downError: function (obj, err) { }
         , queueComplete: function () { }
 	};
-	
+
 	var browserName = navigator.userAgent.toLowerCase();
 	this.ie = browserName.indexOf("msie") > 0;
 	this.ie = this.ie ? this.ie : browserName.search(/(msie\s|trident.*rv:)([\w.]+)/) != -1;
@@ -95,9 +95,9 @@ function DownloaderMgr()
 	this.nat_load = false;
     this.chrVer = navigator.appVersion.match(/Chrome\/(\d+)/);
     this.edge = navigator.userAgent.indexOf("Edge") > 0;
-    this.edgeApp = new WebServer(this);
+    this.edgeApp = new WebServerDown2(this);
     this.edgeApp.ent.on_close = function () { _this.socket_close(); };
-    this.app = up6_app;
+    this.app = down2_app;
     this.app.edgeApp = this.edgeApp;
     this.app.Config = this.Config;
     this.app.ins = this;

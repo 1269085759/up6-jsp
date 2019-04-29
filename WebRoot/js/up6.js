@@ -29,7 +29,13 @@ var HttpUploaderErrorCode = {
 	, "6": "文件被占用"
     , "7": "文件夹子元素数量超过限制"
     , "8": "文件夹大小超过限制"
-    , "9": "文件夹子文件大小超过限制"
+    , "9": "子文件大小超过限制"
+    , "10": "文件夹数量超过限制"
+    , "11": "服务器返回数据错误"
+    , "12": "连接服务器失败"
+    , "13": "请求超时"
+    , "14": "上传地址错误"
+    , "15": "文件块MD5不匹配"
 	, "100": "服务器错误"
 };
 var up6_err_solve = {
@@ -97,6 +103,7 @@ function HttpUploaderMgr()
         , "FdSizeLimit"     : 0//文件夹大小限制。0表示不限制
         , "FdChildLimit"    : 0//文件夹子元素数量限制（子文件+子文件夹）。0表示不限制
         , "ProcSaveTm"      : 60//定时保存进度。单位：秒，默认：1分钟
+        , "AutoConnect"     : {opened:false,time:3000}//启动错误自动重传
 		//文件夹操作相关
 		, "UrlFdCreate"		: "http://localhost:8080/up6/db/fd_create.jsp"
 		, "UrlFdComplete"	: "http://localhost:8080/up6/db/fd_complete.jsp"
@@ -140,7 +147,8 @@ function HttpUploaderMgr()
 
 	//http://www.ncmem.com/
 	this.Domain = "http://" + document.location.host;
-	this.working = false;
+    this.working = false;
+    this.websocketInited = false;
 
     this.FileFilter = this.Config.FileFilter.split(","); //文件过滤器
 	this.filesMap = new Object(); //本地文件列表映射表
@@ -154,7 +162,6 @@ function HttpUploaderMgr()
 	this.Droper = null;
 	this.tmpFile = null;
 	this.tmpFolder = null;
-	this.tmpSpliter = null;
 	this.uiSetupTip = null;
 	this.btnSetup = null;
     //检查版本 Win32/Win64/Firefox/Chrome
@@ -170,7 +177,7 @@ function HttpUploaderMgr()
 	this.chrVer = navigator.appVersion.match(/Chrome\/(\d+)/);
 	this.ffVer = navigator.userAgent.match(/Firefox\/(\d+)/);
 	this.edge = navigator.userAgent.indexOf("Edge") > 0;
-    this.edgeApp = new WebServer(this);
+    this.edgeApp = new WebServerUp6(this);
     this.edgeApp.ent.on_close = function () { _this.socket_close(); };
     this.app = up6_app;
     this.app.edgeApp = this.edgeApp;
@@ -443,8 +450,6 @@ function HttpUploaderMgr()
 						<span class="btn-box hide" name="del" title="删除"><img src="js/del.png"/><div>删除</div></span>\
 					</div>';
 		acx += '</div>';
-		//分隔线
-		acx += '<div class="file-line" name="lineSplite"></div>';
 		//上传列表
 		acx += '<div class="files-panel" name="post_panel">\
 					<div name="post_head" class="toolbar">\
@@ -474,6 +479,12 @@ function HttpUploaderMgr()
 		$("#liPnlFiles").click();
 	};
 
+    //删除文件对象
+    this.del_file = function (id) {
+        this.filesMap = $.grep(this.filesMap, function (i, n) {
+            return i == id;
+        },true);
+    };
 	this.set_config = function (v) { jQuery.extend(this.Config, v);};
 	this.open_files = function (json)
 	{
@@ -541,6 +552,9 @@ function HttpUploaderMgr()
     };
     this.load_complete = function (json)
     {
+        if (this.websocketInited) return;
+        this.websocketInited = true;
+
         this.btnSetup.hide();
         var needUpdate = true;
         if (typeof (json.version) != "undefined") {
@@ -552,7 +566,7 @@ function HttpUploaderMgr()
         else { this.btnSetup.hide(); }
     };
 	this.load_complete_edge = function (json)
-	{
+    {
 	    this.edge_load = true;
         this.btnSetup.hide();
         _this.app.init();
@@ -704,7 +718,6 @@ function HttpUploaderMgr()
 	    this.filesUI        = post_body;
 	    this.tmpFile        = panel.find('div[name="fileItem"]');
 	    this.tmpFolder      = panel.find('div[name="folderItem"]');
-	    this.tmpSpliter     = panel.find('div[name="lineSplite"]');
 	    this.pnlHeader      = panel.find('div[name="pnlHeader"]');
         this.btnSetup       = panel.find('span[name="btnSetup"]').click(function () {
             window.open(_this.Config.exe.path);
@@ -913,14 +926,11 @@ function HttpUploaderMgr()
 	参数:
 	[0]:文件名称
 	*/
-	this.Exist = function()
+	this.Exist = function(fn)
 	{
-		var fn = arguments[0];
-
 		for (a in _this.filesMap)
 		{
 		    var fileSvr = _this.filesMap[a].fileSvr;
-		    if (_this.filesMap[a].isFolder) fileSvr = _this.filesMap[a].folderSvr;
 		    if (fileSvr.pathLoc == fn)
 		    {
 		        return true;
@@ -988,7 +998,10 @@ function HttpUploaderMgr()
 	this.addFileLoc = function(fileLoc)
 	{
 		//本地文件名称存在
-		//if (_this.Exist(fileLoc.pathLoc)) return;
+        if (_this.Exist(fileLoc.pathLoc)) {
+            alert("队列中已存在相同文件，请重新选择。");
+            return;
+        }
 		//此类型为过滤类型
 		if (_this.NeedFilter(fileLoc.ext)) return;
 
@@ -996,11 +1009,8 @@ function HttpUploaderMgr()
 		_this.AppendQueue(fileLoc.id);//添加到队列
 
 		var ui = _this.tmpFile.clone();//文件信息
-		var sp = _this.tmpSpliter.clone();//分隔线
 		_this.filesUI.append(ui);//添加文件信息
-		_this.filesUI.append(sp);//添加分隔线
 		ui.css("display", "block");
-		sp.css("display", "block");
 
 		var uiName      = ui.find("div[name='fileName']");
 		var uiSize      = ui.find("div[name='fileSize']")
@@ -1014,7 +1024,7 @@ function HttpUploaderMgr()
 		
 		var upFile = new FileUploader(fileLoc, _this);
 		this.filesMap[fileLoc.id] = upFile;//添加到映射表
-		var ui_eles = { msg: uiMsg, process: uiProcess,percent:uiPercent, btn: { del: btnDel, cancel: btnCancel,post:btnPost,stop:btnStop }, div: ui, split: sp };
+		var ui_eles = { msg: uiMsg, process: uiProcess,percent:uiPercent, btn: { del: btnDel, cancel: btnCancel,post:btnPost,stop:btnStop }, div: ui};
         upFile.ui = ui_eles;
         $.each(ui_eles.btn, function (i, n) {
             $(n).hover(function () {
@@ -1066,7 +1076,10 @@ function HttpUploaderMgr()
 	{
 	    var fdLoc = json;
 		//本地文件夹存在
-	    //if (this.Exist(fdLoc.pathLoc)) return;
+        if (this.Exist(fdLoc.pathLoc)) {
+            alert("队列中已存在相同文件，请重新选择。");
+            return;
+        }
         //针对空文件夹的处理
 	    if (json.files == null) jQuery.extend(fdLoc,{files:[]});
 	    //if (json.lenLoc == 0) return;
@@ -1074,11 +1087,8 @@ function HttpUploaderMgr()
 		this.AppendQueue(json.id);//添加到队列
 
 		var ui = this.tmpFolder.clone();//文件夹信息
-		var sp = this.tmpSpliter.clone();//分隔线
 		this.filesUI.append(ui);//添加到上传列表面板
-		this.filesUI.append(sp);
 		ui.css("display", "block");
-		sp.css("display", "block");
 
 		var uiName      = ui.find("div[name='fileName']");
 		var uiSize      = ui.find("div[name='fileSize']")
@@ -1089,7 +1099,7 @@ function HttpUploaderMgr()
 		var btnStop     = ui.find("span[name='stop']");
 		var btnDel      = ui.find("span[name='del']");
 		var divPercent	= ui.find("div[name='percent']");
-		var ui_eles = { msg: divMsg,size:uiSize, process: divProcess, percent: divPercent, btn: { del: btnDel, cancel: btnCancel, post: btnPost, stop: btnStop }, split: sp, div: ui };
+		var ui_eles = { msg: divMsg,size:uiSize, process: divProcess, percent: divPercent, btn: { del: btnDel, cancel: btnCancel, post: btnPost, stop: btnStop }, div: ui };
         $.each(ui_eles.btn, function (i, e) {
             $(e).hover(function () {
             $(this).addClass("btn-box-hover");

@@ -1,4 +1,4 @@
-function WebServer(mgr)
+function WebServerDown2(mgr)
 {
     var _this = this;
     // 创建一个Socket实例
@@ -25,7 +25,8 @@ function WebServer(mgr)
     };
     this.runChr = function () {
         var protocol = mgr.Config.edge.protocol + "://" + mgr.Config.edge.port;
-        var html = "<iframe id='uri-fra' width=1 height=1 src='" + protocol + "'></iframe>";
+        var html = "<iframe id='down2-uri-fra' width=1 height=1 src='" + protocol + "'></iframe>";
+        $("#down2-uri-fra").remove();
         $(document.body).append(html);
         setTimeout(function () { _this.connect() }, 1000);//启动定时器
     };
