@@ -97,7 +97,7 @@ function FolderUploader(fdLoc, mgr)
         if (this.folderInit)
         {
             //已传完，未扫描
-            if (this.fileSvr.lenLoc == this.fileSvr.lenSvr) { this.post_complete({fileCount:0,completes:0,errors:0}); }
+            if (this.fileSvr.lenLoc == this.fileSvr.lenSvr) { this.post_complete_scan(); }
             else this.post_fd();
         }
         else
@@ -258,6 +258,40 @@ function FolderUploader(fdLoc, mgr)
 			}
 			, error: function (req, txt, err) { alert("向服务器发送文件夹Complete信息错误！" + req.responseText); }
 			, complete: function (req, sta) { req = null; }
+        });
+    };
+    this.post_complete_scan = function () {
+        $.each(this.ui.btn, function (i, n) {
+            n.hide();
+        });
+        this.ui.process.css("width", "100%");
+        this.ui.percent.text("(100%)");
+        this.manager.arrFilesComplete.push(this);
+        this.State = HttpUploaderState.Complete;
+        this.fileSvr.complete = true;
+        this.fileSvr.perSvr = "100%";
+        //从上传列表中删除
+        this.manager.RemoveQueuePost(this.id);
+        //从未上传列表中删除
+        this.manager.RemoveQueueWait(this.id);
+        this.ui.msg.text("上传完毕");
+
+        var param = jQuery.extend({}, this.fields, { id: this.fileSvr.id, time: new Date().getTime() });
+
+        $.ajax({
+            type: "GET"
+            , dataType: 'jsonp'
+            , jsonp: "callback" //自定义的jsonp回调函数名称，默认为jQuery自动生成的随机函数名
+            , url: this.Config["UrlFdComplete"]
+            , data: param
+            , success: function (msg) {
+                _this.event.fdComplete(_this);//触发事件
+                //添加到文件列表
+                _this.FileListMgr.UploadComplete(_this.fileSvr);
+                _this.manager.PostNext();
+            }
+            , error: function (req, txt, err) { alert("向服务器发送文件夹Complete信息错误！" + req.responseText); }
+            , complete: function (req, sta) { req = null; }
         });
     };
     this.md5_error = function (json)
