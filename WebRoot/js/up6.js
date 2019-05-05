@@ -133,6 +133,15 @@ function HttpUploaderMgr()
         , exe: { path: "http://www.ncmem.com/download/up6.3/up6.exe" }
 		, "SetupPath": "http://localhost:4955/demoAccess/js/setup.htm"
         , "Fields": {"uname": "test","upass": "test","uid":"0"}
+        , ui: {
+            icon: {
+                file: "http://localhost:8080/up6/js/file.png"
+                , folder: "http://localhost:8080/up6/js/folder.png"
+                , stop: "http://localhost:8080/up6/js/stop.png"
+                , del: "http://localhost:8080/up6/js/del.png"
+                , post: "http://localhost:8080/up6/js/post.png"
+            }
+        }
 	};
 
     //biz event
@@ -414,7 +423,7 @@ function HttpUploaderMgr()
 		
 		//上传列表项模板
 		acx += '<div class="file-item" id="tmpFile" name="fileItem">\
-                    <div class="img-box"><img src="js/file.png"/></div>\
+                    <div class="img-box"><img name="file" src="js/file.png"/></div>\
 					<div class="area-l">\
 						<div class="file-head">\
 						    <div name="fileName" class="name">HttpUploader程序开发.pdf</div>\
@@ -425,15 +434,15 @@ function HttpUploaderMgr()
 						<div name="msg" class="msg top-space">15.3MB 20KB/S 10:02:00</div>\
 					</div>\
 					<div class="area-r">\
-                        <span class="btn-box" name="cancel" title="取消"><img src="js/stop.png"/><div>取消</div></span>\
-                        <span class="btn-box hide" name="post" title="继续"><img src="js/post.png"/><div>继续</div></span>\
-						<span class="btn-box hide" name="stop" title="停止"><img src="js/stop.png"/><div>停止</div></span>\
-						<span class="btn-box hide" name="del" title="删除"><img src="js/del.png"/><div>删除</div></span>\
+                        <span class="btn-box" name="cancel" title="取消"><img name="stop" src="js/stop.png"/><div>取消</div></span>\
+                        <span class="btn-box hide" name="post" title="继续"><img name="post" src="js/post.png"/><div>继续</div></span>\
+						<span class="btn-box hide" name="stop" title="停止"><img name="stop" src="js/stop.png"/><div>停止</div></span>\
+						<span class="btn-box hide" name="del" title="删除"><img name="del" src="js/del.png"/><div>删除</div></span>\
 					</div>';
 		acx += '</div>';
 		//文件夹模板
 		acx += '<div class="file-item" name="folderItem">\
-					<div class="img-box"><img src="js/folder.png"/></div>\
+					<div class="img-box"><img name="folder" src="js/folder.png"/></div>\
 					<div class="area-l">\
 						<div class="file-head">\
 						    <div name="fileName" class="name">HttpUploader程序开发.pdf</div>\
@@ -444,10 +453,10 @@ function HttpUploaderMgr()
 						<div name="msg" class="msg top-space">15.3MB 20KB/S 10:02:00</div>\
 					</div>\
 					<div class="area-r">\
-                        <span class="btn-box" name="cancel" title="取消"><img src="js/stop.png"/><div>取消</div></span>\
-                        <span class="btn-box hide" name="post" title="继续"><img src="js/post.png"/><div>继续</div></span>\
-						<span class="btn-box hide" name="stop" title="停止"><img src="js/stop.png"/><div>停止</div></span>\
-						<span class="btn-box hide" name="del" title="删除"><img src="js/del.png"/><div>删除</div></span>\
+                        <span class="btn-box" name="cancel" title="取消"><img name="stop" src="js/stop.png"/><div>取消</div></span>\
+                        <span class="btn-box hide" name="post" title="继续"><img name="post" src="js/post.png"/><div>继续</div></span>\
+						<span class="btn-box hide" name="stop" title="停止"><img name="stop" src="js/stop.png"/><div>停止</div></span>\
+						<span class="btn-box hide" name="del" title="删除"><img name="del" src="js/del.png"/><div>删除</div></span>\
 					</div>';
 		acx += '</div>';
 		//上传列表
@@ -708,7 +717,11 @@ function HttpUploaderMgr()
         this.ieParter= dom.find('object[name="parter"]').get(0);
 	    this.Droper  = dom.find('object[name="droper"]').get(0);
 
-	    var panel           = filesLoc.html(this.GetHtmlFiles());
+        var panel = filesLoc.html(this.GetHtmlFiles());
+        //更新图标
+        $.each(this.Config.ui.icon, function (i, n) {
+            panel.find("img[name=\"" + i + "\"]").attr("src",n);
+        });
         var post_panel      = dom.find("div[name='tab-body']");
 	    var post_body       = dom.find("div[name='post_body']");
         var post_head       = dom.find('div[name="post_head"]');
