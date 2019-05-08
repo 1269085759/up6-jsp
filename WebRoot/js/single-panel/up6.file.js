@@ -8,7 +8,6 @@ function FileUploader(fileLoc, mgr)
     this.app = mgr.app;
     this.Manager = mgr; //上传管理器指针
     this.event = mgr.event;
-    this.FileListMgr = mgr.FileListMgr;//文件列表管理器
     this.Config = mgr.Config;
     this.fields = jQuery.extend({}, mgr.Config.Fields, fileLoc.fields);//每一个对象自带一个fields幅本
     this.State = this.Config.state.None;
@@ -122,7 +121,6 @@ function FileUploader(fileLoc, mgr)
 			, success: function (msg)
 			{
 			    _this.event.fileComplete(_this);//触发事件
-			    _this.FileListMgr.UploadComplete(_this.fileSvr);//添加到服务器文件列表
 			    _this.post_next();
 			}
 			, error: function (req, txt, err) { alert("文件-向服务器发送Complete信息错误！" + req.responseText); }
@@ -143,8 +141,6 @@ function FileUploader(fileLoc, mgr)
         this.Manager.RemoveQueuePost(this.fileSvr.id);
         //从未上传列表中删除
         this.Manager.RemoveQueueWait(this.fileSvr.id);
-        //添加到文件列表
-        this.FileListMgr.UploadComplete(this.fileSvr);
         this.post_next();
         this.event.fileComplete(this);//触发事件
     };
@@ -265,7 +261,7 @@ function FileUploader(fileLoc, mgr)
         this.ui.btn.cancel.hide();
         this.ui.btn.stop.show();
         this.State = this.Config.state.Posting;//
-        this.app.postFile({ id: this.fileSvr.id, pathLoc: this.fileSvr.pathLoc, pathSvr:this.fileSvr.pathSvr,lenSvr: this.fileSvr.lenSvr, fields: this.fields });
+        this.app.postFile({ id: this.fileSvr.id, pathLoc: this.fileSvr.pathLoc, pathSvr: this.fileSvr.pathSvr, lenSvr: this.fileSvr.lenSvr, fields: this.fields });
     };
     this.check_file = function ()
     {

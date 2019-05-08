@@ -1,5 +1,6 @@
 <%@ page language="java" import="java.util.*" pageEncoding="UTF-8"%><%@ 
-	page contentType="text/html;charset=UTF-8"%><%@ 
+	page contentType="text/html;charset=UTF-8"%><%@
+	page import="up6.*" %><%@ 
 	page import="down2.biz.*" %><%@
 	page import="down2.model.*" %><%@
 	page import="java.net.URLDecoder" %><%@ 
@@ -26,8 +27,8 @@ String cbk  	 = request.getParameter("callback");//jsonp
 
 if (!StringUtils.isEmpty(uid))
 {
-	DnFile db = new DnFile();	
-	String json = db.all_complete(Integer.parseInt(uid));
+	DBConfig db = new DBConfig();	
+	String json = db.down().all_complete(Integer.parseInt(uid));
 	if(!StringUtils.isBlank(json))
 	{
 		System.out.println("上传文件列表："+json);

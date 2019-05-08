@@ -27,7 +27,8 @@ String json = cbk + "({\"value\":null})";
 
 if (  !StringUtils.isEmpty(id)	)
 {
-	String data = DnFolder.all_file(id);
+	DBConfig db = new DBConfig();
+	String data = db.down().all_file(id);
 	//XDebug.Output("文件列表",data);
 	data = URLEncoder.encode(data,"utf-8");
 	data = data.replace("+","%20");

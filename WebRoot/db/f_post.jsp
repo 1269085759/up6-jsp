@@ -9,7 +9,7 @@
 	page import="org.apache.commons.fileupload.FileUploadException" %><%@
 	page import="org.apache.commons.fileupload.disk.DiskFileItemFactory" %><%@
 	page import="org.apache.commons.fileupload.servlet.ServletFileUpload" %><%@
-	page import="org.apache.commons.lang.StringUtils" %><%@
+	page import="org.apache.commons.lang.*" %><%@
 	page import="java.net.URLDecoder"%><%@ 
 	page import="java.util.Iterator"%><%@ 
 	page import="net.sf.json.JSONObject"%><%@
@@ -47,14 +47,12 @@ String blockSize	= request.getHeader("blockSize");
 String blockIndex	= request.getHeader("blockIndex");
 String blockMd5		= request.getHeader("blockMd5");
 String complete		= request.getHeader("complete");
-String pathSvr		= request.getHeader("pathSvr");
-pathSvr = PathTool.url_decode(pathSvr);
+String pathSvr		= "";
 
 //参数为空 
 if(	 StringUtils.isBlank( uid )
 	|| StringUtils.isBlank( id )
-	|| StringUtils.isBlank( blockOffset ) 
-	|| StringUtils.isBlank(pathSvr))
+	|| StringUtils.isBlank( blockOffset ))
 {
 	XDebug.Output("param is null");
 	return;
@@ -83,7 +81,12 @@ Iterator fileItr = files.iterator();
 while (fileItr.hasNext()) 
 {
 	// 得到当前文件
-	rangeFile = (FileItem) fileItr.next();	
+	rangeFile = (FileItem) fileItr.next();
+	if(StringUtils.equals( rangeFile.getFieldName(),"pathSvr"))
+	{
+		pathSvr = rangeFile.getString();
+		pathSvr = PathTool.url_decode(pathSvr);
+	}
 }
 
 boolean verify = false;

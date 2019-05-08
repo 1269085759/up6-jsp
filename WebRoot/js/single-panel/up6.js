@@ -38,7 +38,6 @@ function getRoot()
     }
 }
 var root = getRoot();
-//jQuery.getScript(root+"up6.edge.js", function (data, status, xhr) { console.log("加载完毕");});
 
 function debugMsg(m) { $("#msg").append(m); }
 function HttpUploaderMgr()
@@ -79,7 +78,7 @@ function HttpUploaderMgr()
 		//文件操作相关
 		, "UrlCreate"		: "http://localhost:8080/up6/db/f_create.jsp"
 		, "UrlPost"			: "http://localhost:8080/up6/db/f_post.jsp"
-        , "UrlProcess"		: "http://localhost:8080/up6/db/f_process.jsp"
+	    , "UrlProcess"		: "http://localhost:8080/up6/db/f_process.jsp"
 		, "UrlComplete"		: "http://localhost:8080/up6/db/f_complete.jsp"
 		, "UrlList"			: "http://localhost:8080/up6/db/f_list.jsp"
 		, "UrlDel"			: "http://localhost:8080/up6/db/f_del.jsp"
@@ -100,16 +99,7 @@ function HttpUploaderMgr()
         , edge: {protocol:"up6",port:9100,visible:false}
         , exe: { path: "http://www.ncmem.com/download/up6.3/up6.exe" }
 		, "SetupPath": "http://localhost:4955/demoAccess/js/setup.htm"
-        , "Fields": {"uname": "test","upass": "test","uid":"0"}
-        , ui: {
-            icon: {
-                file: "http://localhost:8080/up6/js/file.png"
-                , folder: "http://localhost:8080/up6/js/folder.png"
-                , stop: "http://localhost:8080/up6/js/stop.png"
-                , del: "http://localhost:8080/up6/js/del.png"
-                , post: "http://localhost:8080/up6/js/post.png"
-            }
-        }
+        , "Fields": { "uname": "test", "upass": "test", "uid": "0" }
         , errCode: {
             "0": "发送数据错误"
             , "1": "接收数据错误"
@@ -157,7 +147,7 @@ function HttpUploaderMgr()
 	//http://www.ncmem.com/
 	this.Domain = "http://" + document.location.host;
     this.working = false;
-    this.websocketInited = false;
+    this.edgeInited = false;
 
     this.FileFilter = this.Config.FileFilter.split(","); //文件过滤器
 	this.filesMap = new Object(); //本地文件列表映射表
@@ -193,194 +183,7 @@ function HttpUploaderMgr()
     this.app.Config = this.Config;
     this.app.ins = this;
 	if (this.edge) { this.ie = this.firefox = this.chrome = this.chrome45 = false;}
-
-	//服务器文件列表面板
-	this.FileListMgr =
-	{
-		UploaderMgr: _this //文件上传管理器
-		, Config: _this.Config
-		, Fields: _this.Config.Fields
-		, FileItemTemp: null//文件项模板,JQuery
-		, filesUI: null //文件列表容器,JQuery
-		, filesUiMap: new Object()//ui映射表,JQuery
-        , filesSvr: new Array()//服务器文件列表(json obj)
-        , filesSvrMap:new Object()//服务器文件映射表：(id,json obj)
-		, "GetHtml": function ()//加载控件
-		{
-			var html = '<div class="file-list-view" name="file-list-view">\
-							<ul class="file-list-head" name="file-list-head">\
-								<li class="hcb"><input type="checkbox" /></li>\
-								<li class="hname">文件名称</li>\
-								<li class="hsize">大小</li>\
-								<li class="hper">进度</li>\
-								<li class="hop">操作</li>\
-							</ul>\
-							<div name="file-list-body" class="file-list"></div>\
-						</div>';
-			//temp
-			html += '<div class="divHidden">\
-				<ul name="tmpFile">\
-					<li class="fcb"><input type="checkbox" /></li>\
-					<li class="fname" name="fname">文件名称</li>\
-					<li class="fsize" name="fsize">大小</li>\
-					<li class="fper" name="fper">进度</li>\
-					<li class="fop" name="fop">操作</li>\
-				</ul>\
-			</div>';
-			return html;
-		}
-		, "Load": function () {//已弃用
-			document.write(this.GetHtml());
-		}
-		, "LoadTo": function (dom)//加载到指定控件
-		{
-		    var dom             = dom.html(this.GetHtml());
-		    this.filesUI        = dom.find('div[name="file-list-body"]');
-		    this.FileItemTemp   = dom.find('ul[name="tmpFile"]');
-
-		    this.LoadData();
-		}
-		, "LoadData": function ()//从服务器加载数据
-        {
-            var param = jQuery.extend({}, this.Fields, { time: new Date().getTime() });
-			var ref = this;
-			$.ajax({
-				type: "GET"
-				, dataType: 'jsonp'
-				, jsonp: "callback" //自定义的jsonp回调函数名称，默认为jQuery自动生成的随机函数名
-				, url: this.Config["UrlList"]
-                , data: param
-			    , success:function (msg)
-			    {
-			        if (msg.value != null)
-			        {
-			            var files = JSON.parse(decodeURIComponent(msg.value));
-			            for (var i = 0, l = files.length; i < l; ++i)
-			            {
-			                ref.filesSvr.push(files[i].id);
-			                ref.addFileSvr(files[i]);
-			            }
-			        }
-			    }
-			    , error: function (req, txt, err) { alert("加载文件列表错误！" + req.responseText); }
-			    , complete: function (req, sta) { req = null; }
-			});
-		}
-        , "addFileSvr": function (fileSvr)
-        {
-            var ref = this;
-            var id = fileSvr.id;
-            this.filesSvrMap[id] = fileSvr;
-            var ui = this.FileItemTemp.clone();
-            var liName = ui.find('li[name="fname"]');
-            var liSize = ui.find('li[name="fsize"]');
-            var liPer = ui.find('li[name="fper"]');
-            var liOp = ui.find('li[name="fop"]');
-
-            liName.text(fileSvr.nameLoc);
-            liName.attr("title", fileSvr.nameLoc);
-            liSize.text(fileSvr.sizeLoc);
-            liPer.text(fileSvr.perSvr);
-
-            if (fileSvr.complete)
-            {
-                liOp.html('<span fid="' + id + '">删除</span>').css("cursor", "pointer").click(function ()
-                {
-                    ref.RemoveFile(fileSvr);
-                });
-            }
-            else
-            {
-                liOp.html('<span name="btnReUp">续传</span>|<span name="btnDel">删除</span>').css("cursor", "pointer");
-                liOp.find('span[name="btnReUp"]').click(function () { ref.ResumerFile(fileSvr); });
-                liOp.find('span[name="btnDel"]').click(function () { ref.RemoveFile(fileSvr); });
-            }
-            //添加到文件列表项集合
-            this.filesUiMap[fileSvr.id] = ui;
-            this.filesUI.append(ui);
-        }
-		, "UploadComplete": function (fileSvr)//上传完成，将操作改为删除。
-		{
-			//文件已存在
-		    if ( this.filesSvrMap[fileSvr.id] != null)
-		    {
-		        var ref = this;
-		        var id = fileSvr.id;
-		        var ui = this.filesUiMap[id];
-		        var liPer = ui.find('li[name="fper"]');
-		        var liOp = ui.find('li[name="fop"]');
-
-		        liPer.text("100%");
-		        liOp.html("<span>删除</span>").css("cursor", "pointer").click(function ()
-		        {
-		            ref.RemoveFile(fileSvr);
-		        });
-			}
-		    else{ this.addFileSvr(fileSvr); }
-		}//文件夹上传完毕        
-		, "ResumerFile": function (fileSvr)//续传文件
-		{
-			//文件夹任务
-		    if (fileSvr.fdTask)
-			{
-		        _this.ResumeFolder(fileSvr);
-			}
-			else
-			{
-		        _this.ResumeFile(fileSvr);
-			}
-			_this.OpenPnlUpload(); //打开上传面板
-			this.RemoveFileCache(fileSvr.id); //从内存中删除
-			this.UploaderMgr.PostFirst();
-		}
-		, "RemoveFile": function (fileSvr)//删除文件
-		{
-		    if (fileSvr.fdTask)
-		    {
-		        this.RemoveFolder(fileSvr);
-		        return;
-		    }
-		    var ref = this;
-		    var id = fileSvr.id;
-			var item = this.filesSvrMap[id];
-			var ui = this.filesUiMap[id];
-
-			$.ajax({
-				type: "GET"
-				, dataType: 'jsonp'
-				, jsonp: "callback" //自定义的jsonp回调函数名称，默认为jQuery自动生成的随机函数名
-				, url: this.Config["UrlDel"]
-				, data: { uid: fileSvr.uid, id: fileSvr.id, time: new Date().getTime() }
-				, success: function (msg) {if (msg == 1) {ui.empty();}}
-				, error: function (req, txt, err) { alert("发送删除文件信息失败！" + req.responseText); }
-				, complete: function (req, sta) { req = null; }
-			});
-		}
-        , "RemoveFolder": function (fileSvr)
-        {
-            var ref = this;
-            var id = fileSvr.id;
-            var ui = this.filesUiMap[id];
-
-            $.ajax({
-                type: "GET"
-				, dataType: 'jsonp'
-				, jsonp: "callback" //自定义的jsonp回调函数名称，默认为jQuery自动生成的随机函数名
-				, url: this.Config["UrlFdDel"]
-				, data: { uid: fileSvr.uid, id: fileSvr.id,time: new Date().getTime() }
-			    , success:function (msg){if (msg.value == 1){ui.empty();}}
-			    , error: function (req, txt, err) { alert("发送删除文件信息失败！"); }
-			    , complete: function (req, sta) { req = null; }
-            });
-        }
-		, "RemoveFileCache": function (id)
-		{
-		    this.filesSvrMap[id] = null;
-		    this.filesUiMap[id].empty();
-		    this.filesUiMap[id] = null;
-		}
-	};
-
+    
 	//容器的HTML代码
 	this.GetHtmlContainer = function()
 	{
@@ -399,31 +202,11 @@ function HttpUploaderMgr()
 	    com += '<object name="parter" classid="clsid:' + this.Config.ie.part.clsid + '"';
 	    com += ' codebase="' + this.Config.ie.path + '#version=' + this.Config.Version + '" width="1" height="1" ></object>';
 
-	    var html = '<div class="tab-panel">\
-						<ul id="cbHeader" class="tab-item">\
-							<li id="liPnlUploader" class="hover">上传新文件</li>\
-							<li id="liPnlFiles" >文件列表</li>\
-						</ul>\
-						<div name="tab-body" class="tab-body">\
-							<ul name="cbItem" class="block"><li name="filesLoc"></li></ul>\
-							<ul name="cbItem" class="cbItem"><li name="filesSvr"></li></ul>\
-						</div>\
-					</div>';
-	    return com + html;
-	};
-	
-	//文件上传面板。
-	this.GetHtmlFiles = function()
-	{
-		//加载拖拽控件
-		var acx = "";
-		//acx += '<object name="ieDroper" classid="clsid:' + this.Config["ClsidDroper"] + '"';
-		//acx += ' codebase="' + this.Config["CabPath"] + '" width="192" height="192" >';
-		//acx += '</object>';
-		
-		//上传列表项模板
-		acx += '<div class="file-item" id="tmpFile" name="fileItem">\
-                    <div class="img-box"><img name="file" src="js/file.png"/></div>\
+        com += '<div name="files-panel" class="files-panel">';
+
+        //文件模板
+        com += '<div class="file-item" name="fileItem">\
+                    <div class="img-box"><img src="js/file.png"/></div>\
 					<div class="area-l">\
 						<div class="file-head">\
 						    <div name="fileName" class="name">HttpUploader程序开发.pdf</div>\
@@ -434,15 +217,15 @@ function HttpUploaderMgr()
 						<div name="msg" class="msg top-space">15.3MB 20KB/S 10:02:00</div>\
 					</div>\
 					<div class="area-r">\
-                        <span class="btn-box" name="cancel" title="取消"><img name="stop" src="js/stop.png"/><div>取消</div></span>\
-                        <span class="btn-box hide" name="post" title="继续"><img name="post" src="js/post.png"/><div>继续</div></span>\
-						<span class="btn-box hide" name="stop" title="停止"><img name="stop" src="js/stop.png"/><div>停止</div></span>\
-						<span class="btn-box hide" name="del" title="删除"><img name="del" src="js/del.png"/><div>删除</div></span>\
+                        <span class="btn-box hide" name="post" title="继续"><img src="js/post.png"/><div>继续</div></span>\
+                        <span class="btn-box" name="cancel" title="取消"><img src="js/stop.png"/><div>取消</div></span>\
+						<span class="btn-box hide" name="stop" title="停止"><img src="js/stop.png"/><div>停止</div></span>\
+						<span class="btn-box hide" name="del" title="删除"><img src="js/del.png"/><div>删除</div></span>\
 					</div>';
-		acx += '</div>';
-		//文件夹模板
-		acx += '<div class="file-item" name="folderItem">\
-					<div class="img-box"><img name="folder" src="js/folder.png"/></div>\
+        com += '</div>';
+        //文件夹模板
+        com += '<div class="file-item" name="folderItem">\
+					<div class="img-box"><img src="js/folder.png"/></div>\
 					<div class="area-l">\
 						<div class="file-head">\
 						    <div name="fileName" class="name">HttpUploader程序开发.pdf</div>\
@@ -453,41 +236,73 @@ function HttpUploaderMgr()
 						<div name="msg" class="msg top-space">15.3MB 20KB/S 10:02:00</div>\
 					</div>\
 					<div class="area-r">\
-                        <span class="btn-box" name="cancel" title="取消"><img name="stop" src="js/stop.png"/><div>取消</div></span>\
-                        <span class="btn-box hide" name="post" title="继续"><img name="post" src="js/post.png"/><div>继续</div></span>\
-						<span class="btn-box hide" name="stop" title="停止"><img name="stop" src="js/stop.png"/><div>停止</div></span>\
-						<span class="btn-box hide" name="del" title="删除"><img name="del" src="js/del.png"/><div>删除</div></span>\
+                        <span class="btn-box hide" name="post" title="继续"><img src="js/post.png"/><div>继续</div></span>\
+                        <span class="btn-box" name="cancel" title="取消"><img src="js/stop.png"/><div>取消</div></span>\
+						<span class="btn-box hide" name="stop" title="停止"><img src="js/stop.png"/><div>停止</div></span>\
+						<span class="btn-box hide" name="del" title="删除"><img src="js/del.png"/><div>删除</div></span>\
 					</div>';
-		acx += '</div>';
-		//上传列表
-		acx += '<div class="files-panel" name="post_panel">\
-					<div name="post_head" class="toolbar">\
-						<span class="btn" name="btnAddFiles">选择多个文件</span>\
-						<span class="btn" name="btnAddFolder">选择文件夹</span>\
-						<span class="btn" name="btnPasteFile">粘贴文件和目录</span>\
-						<span class="btn" name="btnSetup">安装控件</span>\
+        com += '</div>';
+        //上传列表
+        com += '<div name="post_panel">\
+					<div name="post_head" class="files-toolbar">\
+						<span class="tool-btn" name="btnAddFiles"><img name="up-file" src="js/16/upload.png"/>上传文件</span>\
+						<span class="tool-btn" name="btnAddFolder"><img name="up-folder" src="js/16/folder.png"/>上传文件夹</span>\
+						<span class="tool-btn" name="btnPasteFile"><img name="paste" src="js/16/paste.png"/>粘贴上传</span>\
+						<span class="tool-btn" name="btnSetup">安装控件</span>\
 					</div>\
-					<div class="content" name="post_content">\
-						<div name="post_body" class="file-post-view"></div>\
+					<div name="post_content">\
+						<div name="post_body" class="files-list"></div>\
 					</div>\
-					<div class="footer" name="post_footer">\
-						<span class="btn-footer" name="btnClear">清除已完成文件</a>\
+					<div class="files-toolbar" name="post_footer">\
+						<span class="tool-btn" name="btnClear"><img name="paste" src="js/16/clear.png"/>清除已完成</a>\
 					</div>\
 				</div>';
-		return acx;
-	};
-	
-	//打开上传面板
-	this.OpenPnlUpload = function()
-	{
-		$("#liPnlUploader").click();
-	};
-	//打开文件列表面板
-	this.OpenPnlFiles = function()
-	{
-		$("#liPnlFiles").click();
+        com += '</div>';
+	    return com;
 	};
 
+    //加载未完成列表
+    this.load_files = function () {
+        var param = jQuery.extend({}, this.Config.Fields, { time: new Date().getTime() });
+        $.ajax({
+            type: "GET"
+            , dataType: 'jsonp'
+            , jsonp: "callback" //自定义的jsonp回调函数名称，默认为jQuery自动生成的随机函数名
+            , url: this.Config["UrlList"]
+            , data: param
+            , success: function (msg) {
+                if (msg.value != null) {
+                    var files = JSON.parse(decodeURIComponent(msg.value));
+                    $.each(files, function (i, n) {
+                        if (n.fdTask)
+                        {
+                            var fd = _this.addFolderLoc(n);
+                            if (null == fd) return;
+                            fd.folderInit = true;
+                            fd.Scaned = true;
+                            fd.ui.percent.text("(" + n.perSvr + ")");
+                            fd.ui.process.css("width", n.perSvr);
+                            fd.ui.btn.post.show();
+                            fd.ui.btn.cancel.show();
+                            _this.RemoveQueue(fd.fileSvr.id);
+                        }
+                        else
+                        {
+                            var f = _this.addFileLoc(n);
+                            if (null == f) return;
+                            f.ui.percent.text("(" + n.perSvr + ")");
+                            f.ui.process.css("width", n.perSvr);
+                            f.ui.btn.post.show();
+                            f.ui.btn.cancel.show();
+                            _this.RemoveQueue(f.fileSvr.id);
+                        }
+                    });
+                }
+            }
+            , error: function (req, txt, err) { alert("加载文件列表错误！" + req.responseText); }
+            , complete: function (req, sta) { req = null; }
+        });
+    }
     //删除文件对象
     this.del_file = function (id) {
         this.filesMap = $.grep(this.filesMap, function (i, n) {
@@ -561,8 +376,8 @@ function HttpUploaderMgr()
     };
     this.load_complete = function (json)
     {
-        if (this.websocketInited) return;
-        this.websocketInited = true;
+        if (this.edgeInited) return;
+        this.edgeInited = true;
 
         this.btnSetup.hide();
         var needUpdate = true;
@@ -573,6 +388,9 @@ function HttpUploaderMgr()
         }
         if (needUpdate) this.update_notice();
         else { this.btnSetup.hide(); }
+        setTimeout(function () {
+            _this.load_files();
+        }, 400);
     };
 	this.load_complete_edge = function (json)
     {
@@ -711,38 +529,31 @@ function HttpUploaderMgr()
 
 	this.initUI = function (dom)
 	{
-	    var filesSvr = dom.find('li[name="filesSvr"]');
-	    var filesLoc = dom.find('li[name="filesLoc"]');
+        var panel = dom.find('div[name="files-panel"]');
         this.parter  = dom.find('embed[name="ffParter"]').get(0);
         this.ieParter= dom.find('object[name="parter"]').get(0);
 	    this.Droper  = dom.find('object[name="droper"]').get(0);
 
-        var panel = filesLoc.html(this.GetHtmlFiles());
-        //更新图标
-        $.each(this.Config.ui.icon, function (i, n) {
-            panel.find("img[name=\"" + i + "\"]").attr("src",n);
-        });
         var post_panel      = dom.find("div[name='tab-body']");
 	    var post_body       = dom.find("div[name='post_body']");
         var post_head       = dom.find('div[name="post_head"]');
         var post_foot       = dom.find('div[name="post_footer"]');
-        post_body.height(post_panel.height() - post_head.height() - post_foot.outerHeight());
+        post_body.height(panel.height() - post_head.height() - post_foot.outerHeight());
 
 	    this.filesUI        = post_body;
 	    this.tmpFile        = panel.find('div[name="fileItem"]');
 	    this.tmpFolder      = panel.find('div[name="folderItem"]');
-	    this.pnlHeader      = panel.find('div[name="pnlHeader"]');
         this.btnSetup       = panel.find('span[name="btnSetup"]').click(function () {
             window.open(_this.Config.exe.path);
         });//("href",this.Config.exe.path);
 	    //drag files
 
-        panel.find('span[class="btn"]').each(function ()
+        panel.find('span[class="tool-btn"]').each(function ()
         {
             $(this).hover(function () {
-                $(this).addClass("btn-hover");
+                $(this).addClass("tool-btn-hover");
             }, function () {
-                $(this).removeClass("btn-hover");
+                $(this).removeClass("tool-btn-hover");
             });
         });
 	    //添加多个文件
@@ -754,18 +565,12 @@ function HttpUploaderMgr()
 	    //清空已完成文件
         panel.find('span[name="btnClear"]').click(function () { _this.ClearComplete(); })
             .hover(function () {
-                $(this).addClass("btn-footer-hover");
+                $(this).addClass("tool-btn-hover");
             }, function () {
-                $(this).removeClass("btn-footer-hover");
+                $(this).removeClass("tool-btn-hover");
             });
 
-	    this.SafeCheck();
-	    this.FileListMgr.LoadTo(filesSvr);
-	    //动态调整高度
-	    var files_head = dom.find('ul[name="file-list-head"]');
-	    this.FileListMgr.filesUI.height(post_panel.height() - 28);
-
-        this.InitContainer();
+	    this.SafeCheck();	    
 
         $(function ()
         {
@@ -784,38 +589,6 @@ function HttpUploaderMgr()
                 _this.app.init();
             }
         });
-	};
-	
-	//初始化容器
-	this.InitContainer = function()
-	{
-		var cbItemLast = null;
-		$("#cbHeader li").each(function(n)
-		{
-			if (this.className == "hover")
-			{
-				cbItemLast = this;
-			}
-
-			$(this).click(function()
-			{
-				$("ul[name='cbItem']").each(function(i)
-				{
-					this.style.display = i == n ? "block" : "none"; /*确定主区域显示哪一个对象*/
-				});
-				if (cbItemLast) cbItemLast.className = "";
-
-				if (this.className == "hover")
-				{
-					this.className = "";
-				}
-				else
-				{
-					this.className = "hover";
-				}
-				cbItemLast = this;
-			});
-		});
 	};
 
     //清除已完成文件
@@ -1013,7 +786,7 @@ function HttpUploaderMgr()
 		//本地文件名称存在
         if (_this.Exist(fileLoc.pathLoc)) {
             alert("队列中已存在相同文件，请重新选择。");
-            return;
+            return null;
         }
 		//此类型为过滤类型
 		if (_this.NeedFilter(fileLoc.ext)) return;
@@ -1090,8 +863,8 @@ function HttpUploaderMgr()
 	    var fdLoc = json;
 		//本地文件夹存在
         if (this.Exist(fdLoc.pathLoc)) {
-            alert("队列中已存在相同文件，请重新选择。");
-            return;
+            alert("队列中已存在相同文件夹，请重新选择。");
+            return null;
         }
         //针对空文件夹的处理
 	    if (json.files == null) jQuery.extend(fdLoc,{files:[]});
@@ -1121,9 +894,7 @@ function HttpUploaderMgr()
             });
         });
 		divPercent.text("(0%)");
-		divProcess.css("width",fdLoc.perSvr);
 		divMsg.text("");
-		//if(fdLoc.fdName != null) fdLoc.name = fdLoc.fdName;
 		uiName.text(fdLoc.nameLoc);
 		uiName.attr("title", fdLoc.nameLoc + "\n文件：" + fdLoc.files.length + "\n文件夹：" + fdLoc.foldersCount + "\n大小：" + fdLoc.sizeLoc);
 		uiSize.text("0字节");
@@ -1165,7 +936,8 @@ function HttpUploaderMgr()
 
 	this.ResumeFolder = function (fileSvr)
 	{
-	    var fd = this.addFolderLoc(fileSvr);
+        var fd = this.addFolderLoc(fileSvr);
+        if (null == fd) return;
         fd.folderInit = true;
         fd.Scaned = true;
         fd.ui.size.text(fileSvr.sizeLoc);

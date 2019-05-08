@@ -16,7 +16,6 @@ function FolderUploader(fdLoc, mgr)
     this.manager = mgr;
     this.event = mgr.event;
     this.arrFiles = new Array(); //子文件列表(未上传文件列表)，存HttpUploader对象
-    this.FileListMgr = mgr.FileListMgr;//文件列表管理器
     this.Config = mgr.Config;
     this.fields = jQuery.extend({}, mgr.Config.Fields,fdLoc.fields);//每一个对象自带一个fields幅本
     this.app = mgr.app;
@@ -26,12 +25,13 @@ function FolderUploader(fdLoc, mgr)
     //准备
     this.Ready = function ()
     {
+        this.ui.size.text(this.fileSvr.sizeLoc);
+        this.ui.percent.text("(" + this.fileSvr.perSvr + ")");
         this.ui.msg.text("正在上传队列中等待...");
         this.State = this.Config.state.Ready;
     };
     this.svr_create = function (fdSvr)
     {
-		//jQuery.extend(this.fileSvr,fdSvr);
         if (fdSvr.complete)
         {
             this.all_complete();
@@ -96,9 +96,7 @@ function FolderUploader(fdLoc, mgr)
         //如果文件夹已初始化，表示续传。
         if (this.folderInit)
         {
-            //已传完，未扫描
-            if (this.fileSvr.lenLoc == this.fileSvr.lenSvr) { this.post_complete_scan(); }
-            else this.post_fd();
+            this.post_fd();
         }
         else
         {
@@ -253,45 +251,10 @@ function FolderUploader(fdLoc, mgr)
 			{
 			    _this.event.fdComplete(_this);//触发事件
 			    //添加到文件列表
-			    _this.FileListMgr.UploadComplete(_this.fileSvr);
 			    _this.manager.PostNext();
 			}
 			, error: function (req, txt, err) { alert("向服务器发送文件夹Complete信息错误！" + req.responseText); }
 			, complete: function (req, sta) { req = null; }
-        });
-    };
-    this.post_complete_scan = function () {
-        $.each(this.ui.btn, function (i, n) {
-            n.hide();
-        });
-        this.ui.process.css("width", "100%");
-        this.ui.percent.text("(100%)");
-        this.manager.arrFilesComplete.push(this);
-        this.State = this.Config.state.Complete;
-        this.fileSvr.complete = true;
-        this.fileSvr.perSvr = "100%";
-        //从上传列表中删除
-        this.manager.RemoveQueuePost(this.id);
-        //从未上传列表中删除
-        this.manager.RemoveQueueWait(this.id);
-        this.ui.msg.text("上传完毕");
-
-        var param = jQuery.extend({}, this.fields, { id: this.fileSvr.id, time: new Date().getTime() });
-
-        $.ajax({
-            type: "GET"
-            , dataType: 'jsonp'
-            , jsonp: "callback" //自定义的jsonp回调函数名称，默认为jQuery自动生成的随机函数名
-            , url: this.Config["UrlFdComplete"]
-            , data: param
-            , success: function (msg) {
-                _this.event.fdComplete(_this);//触发事件
-                //添加到文件列表
-                _this.FileListMgr.UploadComplete(_this.fileSvr);
-                _this.manager.PostNext();
-            }
-            , error: function (req, txt, err) { alert("向服务器发送文件夹Complete信息错误！" + req.responseText); }
-            , complete: function (req, sta) { req = null; }
         });
     };
     this.md5_error = function (json)
@@ -381,7 +344,6 @@ function FolderUploader(fdLoc, mgr)
 			{
 			    _this.event.fdComplete(_this);//触发事件
 			    //添加到文件列表
-			    _this.FileListMgr.UploadComplete(_this.fileSvr);
 			    _this.manager.PostNext();
 			}
 			, error: function (req, txt, err) { alert("向服务器发送文件夹Complete信息错误！" + req.responseText); }
