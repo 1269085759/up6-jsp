@@ -1,20 +1,11 @@
 ﻿/*
-版权所有(C) 2009-2018 荆门泽优软件有限公司
+版权所有(C) 2009-2019 荆门泽优软件有限公司
 保留所有权利
-官方网站：http://www.ncmem.com
-产品论坛：http://bbs.ncmem.com/forum-41-1.html
-产品首页：http://www.ncmem.com/webapp/down2/index.asp
-开发文档：http://www.cnblogs.com/xproer/archive/2011/03/15/1984950.html
-升级日志：http://www.cnblogs.com/xproer/archive/2011/03/15/1985091.html
-示例下载(asp.net)：http://www.ncmem.com/download/down2/asp.net/down2.rar
-示例下载(jsp-mysql)：http://www.ncmem.com/download/down2/jsp/Down2MySQL.rar
-示例下载(jsp-oracle)：http://www.ncmem.com/download/down2/jsp/Down2Oracle.rar
-示例下载(jsp-sql)：http://www.ncmem.com/download/down2/jsp/Down2SQL.rar
-示例下载(php)：http://www.ncmem.com/download/down2/php/down2.rar
-文档下载：http://www.ncmem.com/download/down2/down2-doc.rar
+产品网站：http://www.ncmem.com/webapp/down2/index.aspx
+控件下载：http://www.ncmem.com/webapp/down2/pack.aspx
+示例下载：http://www.ncmem.com/webapp/down2/versions.aspx
 联系邮箱：1085617561@qq.com
-联系QQ：1085617561
-版本：2.4.11
+版本：2.4.13
 更新记录：
     2009-11-05 创建
 	2014-02-27 优化版本号。
@@ -23,18 +14,6 @@
     2017-07-22 优化文件夹下载，优化文件下载。
 */
 function debug_msg(v) { $(document.body).append("<div>"+v+"</div>");}
-//删除元素值
-Array.prototype.remove = function(val)
-{
-	for (var i = 0, n = 0; i < this.length; i++)
-	{
-		if (this[i] != val)
-		{
-			this[n++] = this[i]
-		}
-	}
-	this.length -= 1
-}
 
 function DownloaderMgr()
 {
@@ -77,7 +56,62 @@ function DownloaderMgr()
         , chrome45: { name: "com.xproer.down2", path: "http://www.ncmem.com/download/down2/2.4/down2.nat.crx" }
         , exe: { path: "http://www.ncmem.com/download/down2/2.4/down2.exe" }
         , edge: {protocol:"down2",port:9700,visible:false}
-        , "Fields": {"uname": "test","upass": "test","uid":"0"}
+        , "Fields": { "uname": "test", "upass": "test", "uid": "0" }
+        , errCode: {
+            "0": "发送数据错误"
+            , "1": "接收数据错误"
+            , "2": "访问本地文件错误"
+            , "3": "域名未授权"
+            , "4": "文件大小超过限制"
+            , "5": "地址为空"
+            , "6": "配置文件不存在"
+            , "7": "本地目录不存在"
+            , "8": "查询文件信息失败"
+            , "9": "子文件大小超过限制"
+            , "10": "子文件数量超过限制"}
+        , state: {
+            Ready: 0,
+            Posting: 1,
+            Stop: 2,
+            Error: 3,
+            GetNewID: 4,
+            Complete: 5,
+            WaitContinueUpload: 6,
+            None: 7,
+            Waiting: 8
+        }
+        , ui: {
+            file: 'div[name="file"]'
+            ,panel: 'div[name="down_panel"]'
+            ,list: 'div[name="down_body"]'
+            , header: 'div[name="down_header"]'
+            , toolbar: 'div[name="down_toolbar"]'
+            , footer: 'div[name="down_footer"]'
+            , btn: {
+                setup: 'span[name="btnSetup"]'
+                , setFolder: "span[name='btnSetFolder']"
+                , clear: 'span[name="btnClear"]'
+            }
+            , ele: {
+                ico: {
+                    file: 'img[name="file"]'
+                    , fd: 'img[name="folder"]'
+                }
+                ,name: 'div[name="name"]'
+                ,size: 'div[name="size"]'
+                , process: 'div[name="process"]'
+                , percent: 'div[name="percent"]'
+                , msg: 'div[name="msg"]'
+                , btn: {
+                    cancel: 'span[name="cancel"]'
+                    , stop: 'span[name="stop"]'
+                    , down: 'span[name="down"]'
+                    , del: 'span[name="del"]'
+                    , open: 'span[name="open"]'
+                    ,openFd:'span[name="open-fd"]'
+                }
+            }
+        }
 	};
 
     this.event = {
@@ -110,12 +144,11 @@ function DownloaderMgr()
 	this.filesUrl = new Array();
     this.queueWait = new Array(); //等待队列，数据:id1,id2,id3
     this.queueWork = new Array(); //正在上传的队列，数据:id1,id2,id3
-	this.spliter = null;
-	this.pnlFiles = null;//文件上传列表面板
 	this.parter = null;
 	this.btnSetup = null;//安装控件的按钮
     this.working = false;
     this.allStoped = false;//
+    this.ui = { file: null ,list:null,panel:null,header:null,footer:null};
 
 	this.getHtml = function()
 	{ 
@@ -132,34 +165,32 @@ function DownloaderMgr()
         html += ' codebase="' + this.Config.ie.path + '#version=' + _this.Config["Version"] + '" width="1" height="1" ></object>';
         if (this.edge) html = '';
 	    //上传列表项模板
-	    html += '<div class="file-item file-item-single" name="fileItem">\
-                    <div class="img-box"><img name="fileImg" src="js/file.png"/><img class="hide" name="fdImg" src="js/folder.png"/></div>\
+	    html += '<div class="file-item file-item-single" name="file">\
+                    <div class="img-box"><img name="file" src="js/file.png"/><img class="d-hide" name="folder" src="js/folder.png"/></div>\
 					<div class="area-l">\
-						<div name="fileName" class="name">HttpUploader程序开发.pdf</div>\
+						<div name="name" class="name">HttpUploader程序开发.pdf</div>\
 						<div name="percent" class="percent">(35%)</div>\
-						<div name="fileSize" class="size" child="1">1000.23MB</div>\
+						<div name="size" class="size" child="1">1000.23MB</div>\
 						<div class="process-border"><div name="process" class="process"></div></div>\
 						<div name="msg" class="msg top-space">15.3MB 20KB/S 10:02:00</div>\
 					</div>\
 					<div class="area-r">\
-                        <span tp="btn-item" class="btn-box hide" name="down" title="继续"><div>继续</div></span>\
-						<span tp="btn-item" class="btn-box hide" name="stop" title="停止"><div>停止</div></span>\
+                        <span tp="btn-item" class="btn-box d-hide" name="down" title="继续"><div>继续</div></span>\
+						<span tp="btn-item" class="btn-box d-hide" name="stop" title="停止"><div>停止</div></span>\
                         <span tp="btn-item" class="btn-box" name="cancel" title="取消">取消</span>\
-						<span tp="btn-item" class="btn-box hide" name="del" title="删除"><div>删除</div></span>\
-						<span tp="btn-item" class="btn-box hide" name="open" title="打开"><div>打开</div></span>\
-						<span tp="btn-item" class="btn-box hide" name="open-fd" title="文件夹"><div>文件夹</div></span>\
+						<span tp="btn-item" class="btn-box d-hide" name="del" title="删除"><div>删除</div></span>\
+						<span tp="btn-item" class="btn-box d-hide" name="open" title="打开"><div>打开</div></span>\
+						<span tp="btn-item" class="btn-box d-hide" name="open-fd" title="文件夹"><div>文件夹</div></span>\
 					</div>\
 				</div>';
-		//分隔线
-	    html += '<div class="file-line" name="spliter"></div>';
 		//上传列表
 	    html += '<div class="files-panel" name="down_panel">\
                     <div class="header" name="down_header">下载文件</div>\
 					<div name="down_toolbar" class="toolbar">\
-						<span class="btn" name="btnSetFolder"><div>设置下载目录</div></span>\
-						<span class="btn" name="btnStart">全部下载</span>\
-						<span class="btn" name="btnStop">全部停止</span>\
-						<span class="btn hide" name="btnSetup">安装控件</span>\
+						<span class="toolbar-btn" name="btnSetFolder"><div>设置下载目录</div></span>\
+						<span class="toolbar-btn" name="btnStart">全部下载</span>\
+						<span class="toolbar-btn" name="btnStop">全部停止</span>\
+						<span class="toolbar-btn d-hide" name="btnSetup">安装控件</span>\
 					</div>\
 					<div class="content" name="down_content">\
 						<div name="down_body" class="file-post-view"></div>\
@@ -191,64 +222,81 @@ function DownloaderMgr()
 	        n.remove();
 	    });
 	    this.filesCmp.length = 0;
-	};
+    };
+    this.find_ui = function (o) {
+        var tmp = {
+            ico: {
+                file:o.find(this.Config.ui.ele.ico.file)
+                ,fd: o.find(this.Config.ui.ele.ico.fd)
+            }
+            ,name:o.find(this.Config.ui.ele.name)
+            ,size:o.find(this.Config.ui.ele.size)
+            , process: o.find(this.Config.ui.ele.process)
+            , percent: o.find(this.Config.ui.ele.percent)
+            , msg: o.find(this.Config.ui.ele.msg)
+            , btn: {
+                cancel:o.find(this.Config.ui.ele.btn.cancel)
+                ,stop: o.find(this.Config.ui.ele.btn.stop)
+                ,down: o.find(this.Config.ui.ele.btn.down)
+                ,del: o.find(this.Config.ui.ele.btn.del)
+                ,open: o.find(this.Config.ui.ele.btn.open)
+                , openFd: o.find(this.Config.ui.ele.btn.openFd)
+            }
+            ,div:o
+        };
+        return tmp;
+    };
 	this.add_ui = function (f)
 	{
 	    //存在相同项
-        if (this.exist_url(f.f_id)) return null;
-        this.filesUrl.push(f.f_id);
+        if (this.exist_url(f.nameLoc)) {
+            alert("已存在相同名称的任务：" + f.nameLoc);
+            return null;
+        }
+        this.filesUrl.push(f.nameLoc);
 
 	    var _this = this;
 
-	    var ui = this.tmpFile.clone();
-	    var sp = this.spliter.clone();
-	    ui.css("display", "block");
-	    sp.css("display", "block");
-	    this.pnlFiles.append(ui);
-	    this.pnlFiles.append(sp);
+        var tmp = this.ui.file.clone();
+	    tmp.css("display", "block");
+	    this.ui.list.append(tmp);
+        var ui = this.find_ui(tmp);
 
-	    var uiIcoF    = ui.find("img[name='fileImg']")
-	    var uiIcoFD   = ui.find("img[name='fdImg']")
-	    var uiName    = ui.find("div[name='fileName']")
-	    var uiSize    = ui.find("div[name='fileSize']");
-	    var uiProcess = ui.find("div[name='process']");
-	    var uiPercent = ui.find("div[name='percent']");
-	    var uiMsg     = ui.find("div[name='msg']");
-	    var btnCancel = ui.find("span[name='cancel']");
-        var btnStop   = ui.find("span[name='stop']");
-        var btnDown   = ui.find("span[name='down']");
-        var btnDel    = ui.find("span[name='del']");
-        var btnOpen   = ui.find("span[name='open']");
-        var btnOpenFd = ui.find("span[name='open-fd']");
-        ui.find('span[tp="btn-item"]').hover(function () {
-            $(this).addClass("btn-box-hover");
-        }, function () {$(this).removeClass("btn-box-hover");});
-        var ui_eles = { ico: { file: uiIcoF, fd: uiIcoFD }, msg: uiMsg, name: uiName, size: uiSize, process: uiProcess, percent: uiPercent, btn: { cancel: btnCancel, stop: btnStop, down: btnDown, del: btnDel, open: btnOpen, openFd: btnOpenFd }, div: ui, split: sp };
+        tmp.find('span[tp="btn-item"]').hover(function () {
+            $(this).addClass("bk-hover");
+        }, function () {$(this).removeClass("bk-hover");});
 
         var downer;
         if (f.fdTask) { downer = new FdDownloader(f, this); }
 	    else { downer = new FileDownloader(f,this);}
 	    this.filesMap[f.id] = downer;//
-	    jQuery.extend(downer.ui, ui_eles);
+        downer.ui = ui;
 
-	    uiName.text(f.nameLoc);
-	    uiName.attr("title", f.nameLoc);
-	    uiMsg.text("");
-	    uiSize.text(f.sizeSvr);
-	    uiPercent.text("("+f.perLoc+")");
-        uiProcess.width(f.perLoc);
+	    ui.name.text(f.nameLoc);
+	    ui.name.attr("title", f.nameLoc);
+	    ui.msg.text("");
+	    ui.size.text(f.sizeSvr);
+	    ui.percent.text("("+f.perLoc+")");
+        ui.process.width(f.perLoc);
 
         downer.ready(); //准备
-        //setTimeout(function () { _this.down_next(); },500);
     };
 	this.resume_folder = function (fdSvr)
-	{	    
-		var fd = jQuery.extend({}, fdSvr, { svrInit: true });
-        this.add_ui(fd);
+    {
+        var fd = jQuery.extend({}, fdSvr, { svrInit: true });
+	    this.add_ui(fd);
+	    //if (null == obj) return;
+        //obj.svr_inited = true;
+
+	    //return obj;
     };
     this.resume_file = function (fSvr) {
-    	var f = jQuery.extend({}, fSvr, { svrInit: true });
+        var f = jQuery.extend({}, fSvr, { svrInit: true });
         this.add_ui(f);
+        //if (null == obj) return;
+        //obj.svr_inited = true;
+
+        //return obj;
     };
 	this.init_file = function (f)
     {
@@ -279,7 +327,11 @@ function DownloaderMgr()
 	    }
 	    return v;
 	};
-	this.remove_url = function (url) { this.filesUrl.remove(url); };
+    this.remove_url = function (url) {
+        this.filesUrl = $.grep(this.filesUrl, function (n, i) {
+            return n == url;
+        },true);
+    };
     this.remove_wait = function (id) {
         if (this.queueWait.length == 0) return;
         this.queueWait = $.grep(this.queueWait, function (n, i){
@@ -498,35 +550,34 @@ function DownloaderMgr()
 	};
 	this.initUI = function (ui/*jquery obj*/)
 	{
-	    this.down_panel = ui.find('div[name="down_panel"]');
-	    this.btnSetup = ui.find('span[name="btnSetup"]');
-        this.tmpFile = ui.find('div[name="fileItem"]');
+	    this.down_panel = ui.find(this.Config.ui.panel);
+	    this.btnSetup = ui.find(this.Config.ui.btn.setup);
+        this.ui.file = ui.find(this.Config.ui.file);
         this.parter = ui.find('embed[name="ffParter"]').get(0);
         this.ieParter = ui.find('object[name="parter"]').get(0);
 
-	    var down_body = ui.find("div[name='down_body']");
-	    var down_head = ui.find('div[name="down_header"]');
-	    var post_bar = ui.find('div[name="down_toolbar"]');
-	    var post_foot = ui.find('div[name="down_footer"]');
+	    var down_body = ui.find(this.Config.ui.list);
+	    var down_head = ui.find(this.Config.ui.header);
+	    var post_bar = ui.find(this.Config.ui.toolbar);
+	    var post_foot = ui.find(this.Config.ui.footer);
 	    down_body.height(this.down_panel.height() - post_bar.height() - down_head.height() - post_foot.outerHeight() - 1);
 
-	    var btnSetFolder = ui.find('span[name="btnSetFolder"]');
-	    this.spliter = ui.find('div[name="spliter"]');
-	    this.pnlFiles = down_body;
+	    var btnSetFolder = ui.find(this.Config.ui.btn.setFolder);
+	    this.ui.list = down_body;
 
 	    //设置下载文件夹
         btnSetFolder.click(function () { _this.open_folder(); });
 		//清除已完成
-        ui.find('span[name="btnClear"]').click(function () { _this.clearComplete(); }).hover(function () {
+        ui.find(this.Config.ui.btn.clear).click(function () { _this.clearComplete(); }).hover(function () {
             $(this).addClass("btn-footer-hover");
         }, function () {
             $(this).removeClass("btn-footer-hover");
         });
 		ui.find('span[name="btnStart"]').click(function () { _this.start_queue(); });
         ui.find('span[name="btnStop"]').click(function () { _this.stop_queue(); });
-        ui.find('span[class="btn"]').hover(function () {
-            $(this).addClass("btn-hover");
-        }, function () { $(this).removeClass("btn-hover"); });
+        ui.find('span[class="toolbar-btn"]').hover(function () {
+            $(this).addClass("bk-hover");
+        }, function () { $(this).removeClass("bk-hover"); });
 
         this.safeCheck();//
 

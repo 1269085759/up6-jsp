@@ -534,7 +534,6 @@ function HttpUploaderMgr()
         this.ieParter= dom.find('object[name="parter"]').get(0);
 	    this.Droper  = dom.find('object[name="droper"]').get(0);
 
-        var post_panel      = dom.find("div[name='tab-body']");
 	    var post_body       = dom.find("div[name='post_body']");
         var post_head       = dom.find('div[name="post_head"]');
         var post_foot       = dom.find('div[name="post_footer"]');

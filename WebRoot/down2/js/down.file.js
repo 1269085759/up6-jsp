@@ -1,39 +1,13 @@
-﻿//错误类型
-var DownloadErrorCode = {
-      "0": "发送数据错误"
-	, "1": "接收数据错误"
-	, "2": "访问本地文件错误"
-	, "3": "域名未授权"
-	, "4": "文件大小超过限制"
-	, "5": "地址为空"
-	, "6": "配置文件不存在"
-    , "7": "本地目录不存在"
-    , "8": "查询文件信息失败"
-    , "9": "子文件大小超过限制"
-    , "10": "子文件数量超过限制"
-};
-//状态
-var HttpDownloaderState = {
-    Ready: 0,
-    Posting: 1,
-    Stop: 2,
-    Error: 3,
-    GetNewID: 4,
-    Complete: 5,
-    WaitContinueUpload: 6,
-    None: 7,
-    Waiting: 8
-};
-//文件下载对象
+﻿//文件下载对象
 function FileDownloader(fileLoc, mgr)
 {
     var _this = this;
-    this.ui = { msg: null, process: null, percent: null, btn: {del:null,cancel:null,down:null,stop:null},div:null,split:null};
+    this.ui = { msg: null, process: null, percent: null, btn: {del:null,cancel:null,down:null,stop:null},div:null};
     this.app = mgr.app;
     this.Manager = mgr;
     this.Config = mgr.Config;
     this.fields = jQuery.extend({},mgr.Config.Fields);//每一个对象自带一个fields幅本
-    this.State = HttpDownloaderState.None;
+    this.State = this.Config.state.None;
     this.event = mgr.event;
     this.fileSvr = {
           id:""//
@@ -78,7 +52,7 @@ function FileDownloader(fileLoc, mgr)
         this.ui.ico.file.show();
         this.ui.ico.fd.hide();
         this.ui.msg.text("正在下载队列中等待...");
-        this.State = HttpDownloaderState.Ready;
+        this.State = this.Config.state.Ready;
         this.Manager.add_wait(this.fileSvr.id);//添加到等待队列
     };
     //自定义配置,
@@ -99,7 +73,7 @@ function FileDownloader(fileLoc, mgr)
             this.hideBtns();
             this.ui.btn.stop.show();
             this.ui.msg.text("开始连接服务器...");
-            this.State = HttpDownloaderState.Posting;
+            this.State = this.Config.state.Posting;
             this.Manager.remove_wait(this.fileSvr.id);
             this.app.downFile(this.fileSvr);//下载队列
         }
@@ -114,7 +88,7 @@ function FileDownloader(fileLoc, mgr)
     {
         this.hideBtns();
         this.svr_update();
-        this.State = HttpDownloaderState.Stop;
+        this.State = this.Config.state.Stop;
         this.ui.msg.text("下载已停止");
         this.app.stopFile(this.fileSvr);
         this.Manager.del_work(this.fileSvr.id);//从工作队列中删除
@@ -124,7 +98,6 @@ function FileDownloader(fileLoc, mgr)
     {
         this.app.delFile({id:this.fileSvr.id});
         //从上传列表中删除
-        this.ui.split.remove();
         this.ui.div.remove();
         this.Manager.remove_url(this.fileSvr.f_id);
         this.svr_delete();
@@ -196,7 +169,7 @@ function FileDownloader(fileLoc, mgr)
             _this.down();
         }, 200);
     };
-    this.isComplete = function () { return this.State == HttpDownloaderState.Complete; };
+    this.isComplete = function () { return this.State == this.Config.state.Complete; };
     this.svr_delete = function ()
     {
         var param = jQuery.extend({}, this.fields, { id: this.fileSvr.id }, {time:new Date().getTime()});
@@ -224,7 +197,7 @@ function FileDownloader(fileLoc, mgr)
         this.ui.process.css("width", "100%");
         this.ui.percent.text("(100%)");
         this.ui.msg.text("下载完成");
-        this.State = HttpDownloaderState.Complete;
+        this.State = this.Config.state.Complete;
         this.svr_delete();
         setTimeout(function () { _this.Manager.down_next(); }, 500);
     };
@@ -271,8 +244,8 @@ function FileDownloader(fileLoc, mgr)
         this.ui.btn.down.show();
         this.ui.btn.del.show();
         this.event.downError(this, json.code);//biz event
-        this.ui.msg.text(DownloadErrorCode[json.code+""]);
-        this.State = HttpDownloaderState.Error;
+        this.ui.msg.text(this.Config.errCode[json.code+""]);
+        this.State = this.Config.state.Error;
         this.Manager.del_work(this.fileSvr.id);//从工作队列中删除
         this.Manager.add_wait(this.fileSvr.id);
     };

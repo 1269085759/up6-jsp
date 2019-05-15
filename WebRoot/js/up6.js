@@ -1,16 +1,7 @@
 /*
 	版权所有 2009-2019 荆门泽优软件有限公司
 	保留所有权利
-	官方网站：http://www.ncmem.com/
-	产品首页：http://www.ncmem.com/webapp/up6.2/index.asp
-	产品介绍：http://www.cnblogs.com/xproer/archive/2012/05/29/2523757.html
-	开发文档-ASP：http://www.cnblogs.com/xproer/archive/2012/02/17/2355458.html
-	开发文档-PHP：http://www.cnblogs.com/xproer/archive/2012/02/17/2355467.html
-	开发文档-JSP：http://www.cnblogs.com/xproer/archive/2012/02/17/2355462.html
-	开发文档-ASP.NET：http://www.cnblogs.com/xproer/archive/2012/02/17/2355469.html
-	升级日志：http://www.cnblogs.com/xproer/archive/2012/02/17/2355449.html
-	证书补丁：http://www.ncmem.com/download/WoSignRootUpdate.rar
-	VC运行库：http://www.microsoft.com/en-us/download/details.aspx?id=29
+	产品首页：http://www.ncmem.com/webapp/up6/index.aspx
 	联系信箱：1085617561@qq.com
 	联系QQ：1085617561
     版本：2.3.7
@@ -127,6 +118,7 @@ function HttpUploaderMgr()
             , "13": "请求超时"
             , "14": "上传地址错误"
             , "15": "文件块MD5不匹配"
+            , "16": "读取文件夹配置信息失败"
             , "100": "服务器错误"
         }
         , state: {
@@ -151,6 +143,7 @@ function HttpUploaderMgr()
         , "fileComplete": function (obj/*文件上传完毕，参考：FileUploader*/) { }
         , "fdComplete": function (obj/*文件夹上传完毕，参考：FolderUploader*/) { }
         , "queueComplete": function () {/*队列上传完毕*/ }
+        , "loadComplete": function () {/*控件初始化完毕*/ }
         , "addFdError": function (json) {/*添加文件夹失败*/ }
 	};
 
@@ -573,6 +566,7 @@ function HttpUploaderMgr()
         }
         if (needUpdate) this.update_notice();
         else { this.btnSetup.hide(); }
+        this.event.loadComplete();
     };
 	this.load_complete_edge = function (json)
     {
