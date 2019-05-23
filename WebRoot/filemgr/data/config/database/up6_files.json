@@ -1,0 +1,151 @@
+{
+    "fields": [
+        {
+            "name": "f_id",
+            "type": "string",
+            "primary": true,
+            "length": 32,
+            "identity": false
+        },
+        {
+            "name": "f_pid",
+            "type": "string",
+            "primary": false,
+            "length": 32,
+            "identity": false
+        },
+        {
+            "name": "f_pidRoot",
+            "type": "string",
+            "primary": false,
+            "length": 32,
+            "identity": false
+        },
+        {
+            "name": "f_fdTask",
+            "type": "bool",
+            "primary": false,
+            "length": 1,
+            "identity": false
+        },
+        {
+            "name": "f_fdChild",
+            "type": "bool",
+            "primary": false,
+            "length": 1,
+            "identity": false
+        },
+        {
+            "name": "f_uid",
+            "type": "int",
+            "primary": false,
+            "length": 4,
+            "identity": false
+        },
+        {
+            "name": "f_nameLoc",
+            "type": "string",
+            "primary": false,
+            "length": 255,
+            "identity": false
+        },
+        {
+            "name": "f_nameSvr",
+            "type": "string",
+            "primary": false,
+            "length": 255,
+            "identity": false
+        },
+        {
+            "name": "f_pathLoc",
+            "type": "string",
+            "primary": false,
+            "length": 512,
+            "identity": false
+        },
+        {
+            "name": "f_pathSvr",
+            "type": "string",
+            "primary": false,
+            "length": 512,
+            "identity": false
+        },
+        {
+            "name": "f_pathRel",
+            "type": "string",
+            "primary": false,
+            "length": 512,
+            "identity": false
+        },
+        {
+            "name": "f_md5",
+            "type": "string",
+            "primary": false,
+            "length": 40,
+            "identity": false
+        },
+        {
+            "name": "f_lenLoc",
+            "type": "long",
+            "primary": false,
+            "length": 8,
+            "identity": false
+        },
+        {
+            "name": "f_sizeLoc",
+            "type": "string",
+            "primary": false,
+            "length": 10,
+            "identity": false
+        },
+        {
+            "name": "f_pos",
+            "type": "long",
+            "primary": false,
+            "length": 8,
+            "identity": false
+        },
+        {
+            "name": "f_lenSvr",
+            "type": "long",
+            "primary": false,
+            "length": 8,
+            "identity": false
+        },
+        {
+            "name": "f_perSvr",
+            "type": "string",
+            "primary": false,
+            "length": 6,
+            "identity": false
+        },
+        {
+            "name": "f_complete",
+            "type": "bool",
+            "primary": false,
+            "length": 1,
+            "identity": false
+        },
+        {
+            "name": "f_time",
+            "type": "DateTime",
+            "primary": false,
+            "length": 8,
+            "identity": false
+        },
+        {
+            "name": "f_deleted",
+            "type": "bool",
+            "primary": false,
+            "length": 1,
+            "identity": false
+        },
+        {
+            "name": "f_scan",
+            "type": "bool",
+            "primary": false,
+            "length": 1,
+            "identity": false
+        }
+    ]
+}

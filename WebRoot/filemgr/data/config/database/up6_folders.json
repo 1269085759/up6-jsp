@@ -1,0 +1,114 @@
+{
+	"fields": [{
+		"name": "f_id",
+		"type": "string",
+		"primary": false,
+		"length": 32,
+		"identity": false
+	},
+	{
+		"name": "f_nameLoc",
+		"type": "string",
+		"primary": false,
+		"length": 50,
+		"identity": false
+	},
+	{
+		"name": "f_pid",
+		"type": "string",
+		"primary": false,
+		"length": 32,
+		"identity": false
+	},
+	{
+		"name": "f_uid",
+		"type": "int",
+		"primary": false,
+		"length": 4,
+		"identity": false
+	},
+	{
+		"name": "f_lenLoc",
+		"type": "long",
+		"primary": false,
+		"length": 8,
+		"identity": false
+	},
+	{
+		"name": "f_sizeLoc",
+		"type": "string",
+		"primary": false,
+		"length": 50,
+		"identity": false
+	},
+	{
+		"name": "f_pathLoc",
+		"type": "string",
+		"primary": false,
+		"length": 255,
+		"identity": false
+	},
+	{
+		"name": "f_pathSvr",
+		"type": "string",
+		"primary": false,
+		"length": 255,
+		"identity": false
+	},
+	{
+		"name": "f_folders",
+		"type": "int",
+		"primary": false,
+		"length": 4,
+		"identity": false
+	},
+	{
+		"name": "f_fileCount",
+		"type": "int",
+		"primary": false,
+		"length": 4,
+		"identity": false
+	},
+	{
+		"name": "f_filesComplete",
+		"type": "int",
+		"primary": false,
+		"length": 4,
+		"identity": false
+	},
+	{
+		"name": "f_complete",
+		"type": "bool",
+		"primary": false,
+		"length": 1,
+		"identity": false
+	},
+	{
+		"name": "f_deleted",
+		"type": "bool",
+		"primary": false,
+		"length": 1,
+		"identity": false
+	},
+	{
+		"name": "f_time",
+		"type": "DateTime",
+		"primary": false,
+		"length": 8,
+		"identity": false
+	},
+	{
+		"name": "f_pidRoot",
+		"type": "string",
+		"primary": false,
+		"length": 32,
+		"identity": false
+	},
+	{
+		"name": "f_pathRel",
+		"type": "string",
+		"primary": false,
+		"length": 255,
+		"identity": false
+	}]
+}

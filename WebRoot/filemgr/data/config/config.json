@@ -1,0 +1,12 @@
+{
+    "database": {
+        "up6_files": "/filemgr/data/config/database/up6_files.json",
+        "up6_folders": "/filemgr/data/config/database/up6_folders.json",
+        "down_files": "/filemgr/data/config/database/down_files.json"
+    },
+    "path": "/filemgr/data/config/path.json",
+    "ui": {
+        "down": "/filemgr/data/ui-down.html",
+        "up": "/filemgr/data/ui-down.html"
+    }
+}

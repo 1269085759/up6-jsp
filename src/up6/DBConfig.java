@@ -18,7 +18,7 @@ import down2.biz.DnFileSQL;
  *
  */
 public class DBConfig {
-	String db="sql";//sql,oracle,mysql
+	String m_db="sql";//sql,oracle,mysql
 	
 	String driver = "";
 	String url = "";
@@ -43,19 +43,19 @@ public class DBConfig {
 	
 	public DBConfig() {
 				
-		if( StringUtils.equals(this.db, "sql") )
+		if( StringUtils.equals(this.m_db, "sql") )
 		{
 			this.driver = this.sql_driver;
 			this.url = this.sql_url;
 			this.name = this.sql_name;
 			this.pass = this.sql_pass;
 		}
-		else if( StringUtils.equals(this.db, "mysql") )
+		else if( StringUtils.equals(this.m_db, "mysql") )
 		{
 			this.driver = this.mysql_driver;
 			this.url = this.mysql_url;
 		}
-		else if( StringUtils.equals(this.db, "oracle") )
+		else if( StringUtils.equals(this.m_db, "oracle") )
 		{
 			this.driver = this.oracle_driver;
 			this.url = this.oracle_url;
@@ -65,16 +65,16 @@ public class DBConfig {
 	}
 	
 	public DBFile db() {		
-		if( StringUtils.equals(this.db, "sql") ) return new DBFileSQL();
-		else if( StringUtils.equals(this.db, "mysql") ) return new DBFileMySQL();
-		else if( StringUtils.equals(this.db, "oracle") ) return new DBFileOracle();
+		if( StringUtils.equals(this.m_db, "sql") ) return new DBFileSQL();
+		else if( StringUtils.equals(this.m_db, "mysql") ) return new DBFileMySQL();
+		else if( StringUtils.equals(this.m_db, "oracle") ) return new DBFileOracle();
 		else return new DBFile();
 	}
 	
 	public DnFile down() {
-		if( StringUtils.equals(this.db, "sql") ) return new DnFileSQL();
-		else if( StringUtils.equals(this.db, "mysql") ) return new DnFileMySQL();
-		else if( StringUtils.equals(this.db, "oracle") ) return new DnFileOracle();
+		if( StringUtils.equals(this.m_db, "sql") ) return new DnFileSQL();
+		else if( StringUtils.equals(this.m_db, "mysql") ) return new DnFileMySQL();
+		else if( StringUtils.equals(this.m_db, "oracle") ) return new DnFileOracle();
 		else return new DnFile();		
 		
 	}
@@ -86,7 +86,7 @@ public class DBConfig {
 		try 
 		{
 			Class.forName(this.driver).newInstance();//加载驱动。
-			if (StringUtils.equals(this.db, "mysql")) con = DriverManager.getConnection(this.url);
+			if (StringUtils.equals(this.m_db, "mysql")) con = DriverManager.getConnection(this.url);
 			else con = DriverManager.getConnection(this.url,this.name,this.pass);
 		}
 		catch (SQLException e) 

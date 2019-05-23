@@ -1,0 +1,37 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=gb2312" />
+    <title>up6.2-控件加载测试页面</title>
+    <link href="up6.css" type="text/css" rel="Stylesheet" />
+    <script type="text/javascript" src="jquery-1.4.min.js"></script>
+    <script type="text/javascript" src="json2.min.js" charset="utf-8"></script>
+    <script type="text/javascript" src="up6.config.js" charset="utf-8"></script>
+    <script type="text/javascript" src="up6.app.js" charset="utf-8"></script>
+    <script type="text/javascript" src="up6.edge.js" charset="utf-8"></script>
+    <script type="text/javascript" src="up6.file.js" charset="utf-8"></script>
+    <script type="text/javascript" src="up6.folder.js" charset="utf-8"></script>
+    <script type="text/javascript" src="up6.js" charset="utf-8"></script>
+    <script language="javascript" type="text/javascript">
+        var cbMgr = new HttpUploaderMgr();
+        cbMgr.event.md5Complete = function (obj, md5) { /*alert(md5);*/ };
+        cbMgr.event.fileComplete = function (obj) { /*alert(obj.pathSvr);*/ };
+        cbMgr.event.queueComplete = function () { /*队列上传完毕*/ };
+        cbMgr.event.addFdError = function (jv) { alert("本地路径不存在：" + jv.path); };
+        //使用不同项目配置
+
+        $(function () {
+            cbMgr.load_to("FilePanel");
+        });
+    </script>
+</head>
+<body>
+    <p>控件加载测试页面。此页面仅用于控件加载流程测试。</p>
+    <p>ie浏览器使用注意：</p>
+    <p>此页面不能使用windows.open方式打开。必须在单独的标签中打开。</p>
+    <p>当此页面正常加载成功后则可在其它的window.open弹窗中正常使用。</p>
+    <p>此页面仅需要成功加载一次即可。</p>
+    <div id="FilePanel"></div>
+    <div id="msg"></div>
+</body>
+</html>

@@ -1,0 +1,145 @@
+div.top-space {
+    margin: 3px 0 0 0;
+}
+
+.post-item {
+    font: 12px/12px 新宋体;
+    background-color: #FFFFFF;
+    height: 65px;
+    margin: 0;
+    padding: 0 0 0 2px;
+    display: none;
+    border-bottom: 1px solid #E3E6EB;
+}
+
+    .post-item .name {
+        font: bold 12px/20px 新宋体;
+        width: 180px;
+        height: 20px;
+        float: left;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        overflow: hidden;
+        white-space: nowrap;
+        vertical-align: middle;
+    }
+    /*文件大小*/
+    .post-item .size {
+        font: 12px/20px 新宋体;
+        height: 20px;
+        color: #728089;
+        float: right;
+        text-overflow: ellipsis;
+        overflow: hidden;
+        white-space: nowrap;
+    }
+    /*进度百分比*/
+    .post-item .percent {
+        font: 12px/20px 新宋体;
+        height: 20px;
+        float: right;
+    }
+    /*进度条边框*/
+    .post-item .process-border {
+        margin: 0;
+        padding: 0px;
+        border: 1px solid #AAA;
+        clear: both;
+    }
+
+    .post-item .process {
+        height: 12px;
+        background-color: #A5DF16;
+        width: 0; /*width:200px;*/
+    }
+    /*上传信息*/
+    .post-item .msg {
+        color: #7A8F99;
+        margin: 8px 0 0 0;
+    }
+    /*按钮：取消，暂停，续传*/
+    .post-item .Btn, .post-item .Btn:hover {
+        text-decoration: none;
+        color: #244281;
+        cursor: pointer;
+    }
+
+    .post-item .area-l {
+        width: 68%;
+        float: left;
+        padding: 5px 10px 0 0;
+    }
+
+    .post-item .area-r {
+        width: 22%;
+        float: left;
+    }
+
+    .post-item .img-box {
+        width: 7%;
+        height: 65px;
+        float: left;
+        margin: 0 5px 0 0;
+    }
+
+        .post-item .img-box img {
+            height: 32px;
+            margin: 17px 0 0 0;
+        }
+
+    .post-item .file-head {
+        width: 280px;
+        height: 20px;
+        overflow: hidden;
+        vertical-align: middle;
+    }
+
+    .post-item .img-btn {
+        width: 45px;
+        height: 65px;
+        float: left;
+        overflow: hidden;
+        text-align: center;
+        text-decoration: none;
+        cursor: pointer;
+    }
+
+        .post-item .img-btn img {
+            width: 32px;
+            height: 32px;
+            margin: 10px 0 0 0;
+        }
+
+.hide1 {
+    display: none;
+}
+/*上传面板*/
+.post-container {font: 12px/12px 宋体;font-size:12px !important;}
+
+.files-toolbar{
+    height: 43px;
+    line-height: 43px;
+}
+
+.files-toolbar img {
+    vertical-align: middle;
+}
+
+.btn-t {
+    padding: 0 5px;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-block;
+    height: 35px;
+    line-height: 35px;
+}
+
+.bk-hover {background-color: #DADADA;}
+
+.files-list {
+    background-color: #FFF;
+    font: 12px/12px 宋体,新宋体; /*防目外部样式破坏*/
+    overflow-x: hidden;
+    overflow-y: scroll;
+    height: 415px;
+}

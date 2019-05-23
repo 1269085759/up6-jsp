@@ -1,0 +1,88 @@
+{
+    "fields": [
+        {
+            "name": "f_id",
+            "type": "string",
+            "primary": false,
+            "length": 32,
+            "identity": false
+        },
+        {
+            "name": "f_uid",
+            "type": "int",
+            "primary": false,
+            "length": 4,
+            "identity": false
+        },
+        {
+            "name": "f_mac",
+            "type": "string",
+            "primary": false,
+            "length": 50,
+            "identity": false
+        },
+        {
+            "name": "f_nameLoc",
+            "type": "string",
+            "primary": false,
+            "length": 255,
+            "identity": false
+        },
+        {
+            "name": "f_pathLoc",
+            "type": "string",
+            "primary": false,
+            "length": 255,
+            "identity": false
+        },
+        {
+            "name": "f_fileUrl",
+            "type": "string",
+            "primary": false,
+            "length": 255,
+            "identity": false
+        },
+        {
+            "name": "f_perLoc",
+            "type": "string",
+            "primary": false,
+            "length": 6,
+            "identity": false
+        },
+        {
+            "name": "f_lenLoc",
+            "type": "long",
+            "primary": false,
+            "length": 8,
+            "identity": false
+        },
+        {
+            "name": "f_lenSvr",
+            "type": "long",
+            "primary": false,
+            "length": 8,
+            "identity": false
+        },
+        {
+            "name": "f_sizeSvr",
+            "type": "string",
+            "primary": false,
+            "length": 10,
+            "identity": false
+        },
+        {
+            "name": "f_complete",
+            "type": "bool",
+            "primary": false,
+            "length": 1,
+            "identity": false
+        },
+        {
+            "name": "f_fdTask",
+            "type": "bool",
+            "primary": false,
+            "length": 1,
+            "identity": false
+        }
+    ]
+}
