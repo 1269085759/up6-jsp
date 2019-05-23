@@ -40,6 +40,15 @@ if (  StringUtils.isBlank(fid)
 	return;
 }
 File f = new File(pathSvr);
+//文件不存在
+if(!f.exists())
+{
+	response.setStatus(500);
+	OutputStream os = response.getOutputStream();
+	System.out.println(String.format("%s 文件不存在",pathSvr));
+	os.close();
+	return;
+}
 long fileLen = f.length();
 
 response.setContentType("application/x-download");
