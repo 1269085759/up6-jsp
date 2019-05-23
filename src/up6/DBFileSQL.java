@@ -139,7 +139,7 @@ public class DBFileSQL extends DBFile
 	public void fd_complete(String fid, String uid)
 	{
 		String sql = "update up6_files set f_perSvr='100%',f_lenSvr=f_lenLoc,f_complete=1 where f_id=? and f_uid=?;";
-		sql += "update up6_folders set fd_complete=1 where fd_id=? and fd_uid=?;";
+		sql += "update up6_folders set f_complete=1 where f_id=? and f_uid=?;";
 		sql += "update up6_files set f_perSvr='100%',f_lenSvr=f_lenLoc,f_complete=1 where f_pidRoot=?;";
 		
 		DbHelper db = new DbHelper();
@@ -163,7 +163,7 @@ public class DBFileSQL extends DBFile
 		StringBuilder sb = new StringBuilder();
 		sb.append("update up6_files set f_deleted=1 where f_id=? and f_uid=?;");
 		sb.append("update up6_files set f_deleted=1 where f_pidRoot=? and f_uid=?;");
-		sb.append("update up6_folders set fd_delete=1 where fd_id=? and fd_uid=?;");
+		sb.append("update up6_folders set f_delete=1 where f_id=? and f_uid=?;");
 		DbHelper db = new DbHelper();
 		PreparedStatement cmd = db.GetCommand(sb.toString());
 		try 

@@ -10,7 +10,7 @@
 		"name": "f_nameLoc",
 		"type": "string",
 		"primary": false,
-		"length": 50,
+		"length": 255,
 		"identity": false
 	},
 	{

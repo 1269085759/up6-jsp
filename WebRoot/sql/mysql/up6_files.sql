@@ -7,9 +7,9 @@ CREATE TABLE IF NOT EXISTS `up6_files` (
   `f_uid` 				int(11) default '0',
   `f_nameLoc` 			varchar(255) default '',	/*文件在本地的名称（原始文件名称）*/
   `f_nameSvr` 			varchar(255) default '',	/*文件在服务器的名称*/
-  `f_pathLoc` 			varchar(255) default '',	/*文件在本地的路径*/
-  `f_pathSvr` 			varchar(255) default '',	/*文件在远程服务器中的位置*/
-  `f_pathRel` 			varchar(255) default '',
+  `f_pathLoc` 			varchar(512) default '',	/*文件在本地的路径*/
+  `f_pathSvr` 			varchar(512) default '',	/*文件在远程服务器中的位置*/
+  `f_pathRel` 			varchar(512) default '',
   `f_md5` 				varchar(40) default '',		/*文件MD5*/
   `f_lenLoc` 			bigint(19) default '0',		/*文件大小*/
   `f_sizeLoc` 			varchar(10) default '0',	/*文件大小（格式化的）*/
