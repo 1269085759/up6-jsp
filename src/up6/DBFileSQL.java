@@ -163,7 +163,7 @@ public class DBFileSQL extends DBFile
 		StringBuilder sb = new StringBuilder();
 		sb.append("update up6_files set f_deleted=1 where f_id=? and f_uid=?;");
 		sb.append("update up6_files set f_deleted=1 where f_pidRoot=? and f_uid=?;");
-		sb.append("update up6_folders set f_delete=1 where f_id=? and f_uid=?;");
+		sb.append("update up6_folders set f_deleted=1 where f_id=? and f_uid=?;");
 		DbHelper db = new DbHelper();
 		PreparedStatement cmd = db.GetCommand(sb.toString());
 		try 
