@@ -460,6 +460,13 @@ function HttpUploaderMgr()
 		});
 	};
 
+    this.page_close = function () {
+        if (this.edge) _this.edgeApp.close();
+        if (_this.QueuePost.length > 0) {
+            _this.StopAll();
+        }
+    };
+
 	this.loadAuto = function ()
 	{
 	    var dom = $(document.body).append(this.getHtml());

@@ -48,7 +48,8 @@
         </ol>
         <table class="layui-hide" lay-size="sm" id="files" lay-filter="files" lay-skin="nob"></table>
         <script type="text/javascript">
-            //JavaScript代码区域
+        	var pageApp = null;				
+        	//JavaScript代码区域
             layui.use(['element', 'table','laytpl'], function () {
                 var element = layui.element, table = layui.table,laytpl = layui.laytpl;
 
@@ -78,19 +79,22 @@
                         , { field: 'f_time', title: '上传时间', width:150, templet: function (d) { return moment(d.f_time).format('YYYY-MM-DD HH:mm:ss') } }
                         , { title: '编辑', templet: function (d) { return '<a class="layui-table-link link" lay-event="delete"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span> 删除</a>';} }
                     ]],
-                    done: function (res, curr, count) { pl.attr.ui.table = table;}
+                    done: function (res, curr, count) { pageApp.attr.ui.table = table;}
                 });
 
-                table.on('tool(files)', function (obj) { pl.attr.event.table_tool_click(obj, table);});
+                table.on('tool(files)', function (obj) { pageApp.attr.event.table_tool_click(obj, table);});
 
                 //工具栏
-                table.on('toolbar(files)', function (obj) { pl.attr.event.table_tool_click(obj, table); });
+                table.on('toolbar(files)', function (obj) { pageApp.attr.event.table_tool_click(obj, table); });
 
                 //复选框
-                table.on('checkbox(files)', function (obj) { pl.attr.event.table_check_change(obj, table); });
-                table.on('edit(files)', function (obj) { pl.attr.event.table_edit(obj); });
-                pl.attr.ui.table = table;
+                table.on('checkbox(files)', function (obj) { pageApp.attr.event.table_check_change(obj, table); });
+                table.on('edit(files)', function (obj) { pageApp.attr.event.table_edit(obj); });
+                pageApp.attr.ui.table = table;
             });
+
+            window.onbeforeunload = function (event) { return confirm("确定离开此页面吗？"); }
+            window.unload = function (event) { pageApp.page_close(); };
         </script>
     </div>
 </body>

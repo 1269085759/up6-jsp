@@ -521,7 +521,13 @@ function DownloaderMgr()
                 _this.stop_queue();
             }
         });
-	};
+    };
+    this.page_close = function () {
+        if (this.edge) _this.edgeApp.close();
+        if (_this.queueWork.length > 0) {
+            _this.stop_queue();
+        }
+    };
 	
 	this.loadAuto = function()
 	{
