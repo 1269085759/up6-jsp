@@ -1,9 +1,11 @@
-<%@ page language="java" import="up6.DBFile" pageEncoding="UTF-8"%><%@
-	page contentType="text/html;charset=UTF-8"%><%@ 
-	page import="up6.model.FileInf" %><%@
-	page import="up6.DBConfig" %><%@
-	page import="up6.biz.*" %><%@
-	page import="org.apache.commons.lang.StringUtils" %><%
+<%@ page language="java" import="up6.DBFile" pageEncoding="UTF-8"%>
+<%@ page contentType="text/html;charset=UTF-8"%>
+<%@ page import="up6.model.FileInf" %>
+<%@ page import="up6.DBConfig" %>
+<%@ page import="up6.biz.*" %>
+<%@ page import="org.apache.commons.lang.StringUtils" %>
+<%
+out.clear();
 /*
 	此页面主要更新文件夹数据表。已上传字段
 	更新记录：

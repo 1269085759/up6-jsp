@@ -1,14 +1,16 @@
-<%@ page language="java" import="java.util.*" pageEncoding="UTF-8"%><%@ 
-	page contentType="text/html;charset=UTF-8"%><%@ 
-	page import="down2.biz.*" %><%@ 
-	page import="java.net.URLDecoder" %><%@ 
-	page import="java.net.URLEncoder" %><%@ 
-	page import="org.apache.commons.lang.*" %><%@ 
-	page import="com.google.gson.FieldNamingPolicy" %><%@ 
-	page import="com.google.gson.Gson" %><%@ 
-	page import="com.google.gson.GsonBuilder" %><%@ 
-	page import="com.google.gson.annotations.SerializedName" %><%@ 
-	page import="java.io.*" %><%
+<%@ page language="java" import="java.util.*" pageEncoding="UTF-8"%>
+<%@ page contentType="text/html;charset=UTF-8"%>
+<%@ page import="down2.biz.*" %>
+<%@ page import="java.net.URLDecoder" %>
+<%@ page import="java.net.URLEncoder" %>
+<%@ page import="org.apache.commons.lang.*" %>
+<%@ page import="com.google.gson.FieldNamingPolicy" %>
+<%@ page import="com.google.gson.Gson" %>
+<%@ page import="com.google.gson.GsonBuilder" %>
+<%@ page import="com.google.gson.annotations.SerializedName" %>
+<%@ page import="java.io.*" %>
+<%
+out.clear();
 /*
 	加载未完成的文件和文件夹任务。
 	更新记录：

@@ -1,12 +1,15 @@
-<%@ page language="java" import="up6.*" pageEncoding="UTF-8"%><%@
-	page contentType="text/html;charset=UTF-8"%><%@ 
-	page import="com.google.gson.*" %><%@
-	page import="up6.*" %><%@
-	page import="up6.model.*" %><%@
-	page import="up6.biz.*" %><%@
-	page import="org.apache.commons.lang.StringUtils" %><%@
-	page import="java.net.URLDecoder" %><%@
-	page import="java.net.URLEncoder" %><%/*
+<%@ page language="java" import="up6.*" pageEncoding="UTF-8"%>
+<%@ page contentType="text/html;charset=UTF-8"%>
+<%@ page import="com.google.gson.*" %>
+<%@ page import="up6.*" %>
+<%@ page import="up6.model.*" %>
+<%@ page import="up6.biz.*" %>
+<%@ page import="org.apache.commons.lang.StringUtils" %>
+<%@ page import="java.net.URLDecoder" %>
+<%@ page import="java.net.URLEncoder" %>
+<%
+out.clear();
+/*
 	以md5模式上传文件夹，不在服务端创建层级结构，在数据库中保存层级信息。
 	客户端上传的文件夹JSON格式：
     [

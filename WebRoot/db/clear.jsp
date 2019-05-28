@@ -1,6 +1,8 @@
-<%@ page language="java" import="up6.DBFile" pageEncoding="UTF-8"%><%@
-	page contentType="text/html;charset=UTF-8"%><%@
-	page import="up6.DBConfig" %><%
+<%@ page language="java" import="up6.DBFile" pageEncoding="UTF-8"%>
+<%@ page contentType="text/html;charset=UTF-8"%>
+<%@ page import="up6.DBConfig" %>
+<%
+out.clear();
 /*
 	清空数据库记录
 	更新记录：

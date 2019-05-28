@@ -1,17 +1,20 @@
-<%@ page language="java" import="java.util.*" pageEncoding="UTF-8"%><%@ 
-	page contentType="text/html;charset=UTF-8"%><%@ 
-	page import="up6.*" %><%@
-	page import="up6.model.*" %><%@ 
-	page import="java.nio.*" %><%@
-	page import="java.nio.channels.*" %><%@
-	page import="java.net.URLDecoder" %><%@ 
-	page import="java.net.URLEncoder" %><%@ 
-	page import="org.apache.commons.lang.*" %><%@ 
-	page import="com.google.gson.FieldNamingPolicy" %><%@ 
-	page import="com.google.gson.Gson" %><%@ 
-	page import="com.google.gson.GsonBuilder" %><%@ 
-	page import="com.google.gson.annotations.SerializedName" %><%@ 
-	page import="java.io.*" %><%/*
+<%@ page language="java" import="java.util.*" pageEncoding="UTF-8"%>
+<%@ page contentType="text/html;charset=UTF-8"%>
+<%@ page import="up6.*" %>
+<%@ page import="up6.model.*" %>
+<%@ page import="java.nio.*" %>
+<%@ page import="java.nio.channels.*" %>
+<%@ page import="java.net.URLDecoder" %>
+<%@ page import="java.net.URLEncoder" %>
+<%@ page import="org.apache.commons.lang.*" %>
+<%@ page import="com.google.gson.FieldNamingPolicy" %>
+<%@ page import="com.google.gson.Gson" %>
+<%@ page import="com.google.gson.GsonBuilder" %>
+<%@ page import="com.google.gson.annotations.SerializedName" %>
+<%@ page import="java.io.*" %>
+<%
+out.clear();
+/*
 	下载数据库中的文件。
 	相关错误：
 		getOutputStream() has already been called for this response

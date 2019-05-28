@@ -1,19 +1,22 @@
-<%@ page language="java" import="up6.DBFile" pageEncoding="UTF-8"%><%@
-	page contentType="text/html;charset=UTF-8"%><%@ 
-	page import="up6.FileBlockWriter" %><%@
-	page import="up6.XDebug" %><%@
-	page import="up6.*" %><%@
-	page import="up6.biz.*" %><%@
-	page import="org.apache.commons.fileupload.FileItem" %><%@
-	page import="org.apache.commons.fileupload.FileItemFactory" %><%@
-	page import="org.apache.commons.fileupload.FileUploadException" %><%@
-	page import="org.apache.commons.fileupload.disk.DiskFileItemFactory" %><%@
-	page import="org.apache.commons.fileupload.servlet.ServletFileUpload" %><%@
-	page import="org.apache.commons.lang.*" %><%@
-	page import="java.net.URLDecoder"%><%@ 
-	page import="java.util.Iterator"%><%@ 
-	page import="net.sf.json.JSONObject"%><%@
-	page import="java.util.List"%><%/*
+<%@ page language="java" import="up6.DBFile" pageEncoding="UTF-8"%>
+<%@ page contentType="text/html;charset=UTF-8"%>
+<%@ page import="up6.FileBlockWriter" %>
+<%@ page import="up6.XDebug" %>
+<%@ page import="up6.*" %>
+<%@ page import="up6.biz.*" %>
+<%@ page import="org.apache.commons.fileupload.FileItem" %>
+<%@ page import="org.apache.commons.fileupload.FileItemFactory" %>
+<%@ page import="org.apache.commons.fileupload.FileUploadException" %>
+<%@ page import="org.apache.commons.fileupload.disk.DiskFileItemFactory" %>
+<%@ page import="org.apache.commons.fileupload.servlet.ServletFileUpload" %>
+<%@ page import="org.apache.commons.lang.*" %>
+<%@ page import="java.net.URLDecoder"%>
+<%@ page import="java.util.Iterator"%>
+<%@ page import="net.sf.json.JSONObject"%>
+<%@ page import="java.util.List"%>
+<%
+out.clear();
+/*
 	此页面负责将文件块数据写入文件中。
 	此页面一般由控件负责调用
 	参数：

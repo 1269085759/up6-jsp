@@ -1,6 +1,8 @@
-<%@ page language="java" import="up6.*" pageEncoding="UTF-8"%><%@
-	page contentType="text/html;charset=UTF-8"%><%@ 
-	page import="org.apache.commons.lang.StringUtils" %><%
+<%@ page language="java" import="up6.*" pageEncoding="UTF-8"%>
+<%@ page contentType="text/html;charset=UTF-8"%>
+<%@ page import="org.apache.commons.lang.StringUtils" %>
+<%
+out.clear();
 /*
 	此页面主要用来执行删除文件夹逻辑。
 	只修改数据库中文件夹状态。

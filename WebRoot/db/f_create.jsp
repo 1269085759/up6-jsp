@@ -1,12 +1,15 @@
-<%@ page language="java" import="up6.*" pageEncoding="UTF-8"%><%@
-	page contentType="text/html;charset=UTF-8"%><%@	
-	page import="com.google.gson.Gson" %><%@
-	page import="up6.*" %><%@
-	page import="up6.model.*" %><%@
-	page import="up6.biz.*" %><%@	
-	page import="org.apache.commons.lang.StringUtils" %><%@
-	page import="java.net.URLDecoder" %><%@
-	page import="java.net.URLEncoder" %><%/*
+<%@ page language="java" import="up6.*" pageEncoding="UTF-8"%>
+<%@ page contentType="text/html;charset=UTF-8"%>
+<%@	page import="com.google.gson.Gson" %>
+<%@ page import="up6.*" %>
+<%@ page import="up6.model.*" %>
+<%@ page import="up6.biz.*" %>
+<%@	page import="org.apache.commons.lang.StringUtils" %>
+<%@ page import="java.net.URLDecoder" %>
+<%@ page import="java.net.URLEncoder" %>
+<%
+out.clear();
+/*
 	所有单个文件均以md5模式存储。
 	更新记录：
 		2012-05-24 完善
