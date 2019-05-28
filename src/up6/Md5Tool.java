@@ -105,8 +105,12 @@ public static String fileToMD5(InputStream is){
 			str[k++] = hexDigits[byte0 & 0xf]; // 取字节中低 4 位的数字转换
 		}
 		return new String(str); // 换后的结果转换为字符串
-	} 
-	catch (NoSuchAlgorithmException | IOException e) {e.printStackTrace();}
+	} catch (IOException e){
+        e.printStackTrace();
+    }
+    catch( NoSuchAlgorithmException e){
+    	 e.printStackTrace();    	
+    }
 	return "";	
 }
 }
