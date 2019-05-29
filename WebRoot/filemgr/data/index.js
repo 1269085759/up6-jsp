@@ -595,7 +595,6 @@ function PageLogic() {
 }
 
 $(function () {
-    pageApp = new PageLogic();
     pageApp.init();
     pageApp.init_up6();
     pageApp.init_down2();

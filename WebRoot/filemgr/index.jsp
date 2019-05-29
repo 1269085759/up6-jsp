@@ -48,10 +48,11 @@
         </ol>
         <table class="layui-hide" lay-size="sm" id="files" lay-filter="files" lay-skin="nob"></table>
         <script type="text/javascript">
-        	var pageApp = null;				
+        	var pageApp = new PageLogic();				
         	//JavaScript代码区域
             layui.use(['element', 'table','laytpl'], function () {
                 var element = layui.element, table = layui.table,laytpl = layui.laytpl;
+                pageApp.attr.ui.table = table;
 
                 //js-module
                 table.render({
@@ -79,7 +80,7 @@
                         , { field: 'f_time', title: '上传时间', width:150, templet: function (d) { return moment(d.f_time).format('YYYY-MM-DD HH:mm:ss') } }
                         , { title: '编辑', templet: function (d) { return '<a class="layui-table-link link" lay-event="delete"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span> 删除</a>';} }
                     ]],
-                    done: function (res, curr, count) { pageApp.attr.ui.table = table;}
+                    done: function (res, curr, count) { }
                 });
 
                 table.on('tool(files)', function (obj) { pageApp.attr.event.table_tool_click(obj, table);});
