@@ -95,6 +95,7 @@ public static String fileToMD5(InputStream is){
 		{
 			md.update(buffer,0,len);
 		}
+		is.close();
 		//md.update(is.read(b).getBytes()); // 通过使用 update 方法处理数据,使指定的 byte数组更新摘要
 		byte[] encryptStr = md.digest(); // 获得密文完成哈希计算,产生128 位的长整数
 		char str[] = new char[16 * 2]; // 每个字节用 16 进制表示的话，使用两个字符

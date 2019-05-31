@@ -3,7 +3,7 @@ function PageLogic() {
     this.files_checked = [];
     this.pathCur = { f_id: "", f_pid: "", f_pidRoot: "", f_nameLoc: "根目录", f_pathRel: "/" };//
     this.data = {
-        downPath: "", up6: null, panel: { up: null, down: null }, down2: null,up_inited:false,down_inited:false
+        downPath: "",treeID:"#tree", up6: null, panel: { up: null, down: null }, down2: null,up_inited:false,down_inited:false
     };
     this.ui = {
         ico: [
@@ -24,7 +24,7 @@ function PageLogic() {
         };
         this.data.up6.event.md5Complete = function (obj, md5) { /*alert(md5);*/ };
         this.data.up6.event.fdComplete = function (obj) {
-            _this.attr.event.file_post_complete();
+            _this.attr.event.folder_post_complete(obj);
         };
             this.data.up6.event.fileComplete = function (obj) {
             _this.attr.event.file_post_complete();
@@ -59,6 +59,72 @@ function PageLogic() {
                 img.css("width", n.w);
             }
         });
+    };
+    this.init_path = function () {
+        if (this.attr.nav_path == null) {
+            this.attr.nav_path = new Vue({
+                el: '#path',
+                data: { folders: [], folderCur: this.pathCur }
+                , methods: {
+                    open_folder: function (d) {
+                        _this.open_folder(d);
+                        _this.open_tree_node(d);
+                    }
+                }
+            });
+            this.attr.nav_path.folders.push(this.pathCur);
+        }
+    };
+    this.init_tree = function () {
+        var param = jQuery.extend({}, { time: new Date().getTime() });
+        this.data.tree= $('#tree').jstree({
+            "plugins": ["wholerow"],
+            'core': {
+                "check_callback": true,
+                'data': function (obj, cb) {
+                    var ref = this;
+                    $.ajax({
+                        type: "GET",
+                        url: "index.jsp?op=tree",
+                        dataType: "json",
+                        async: false,
+                        success: function (res) {
+                            cb.call(ref, res);
+                        }
+                    });
+                }
+            }
+        }).bind("select_node.jstree", function (e, data) {
+            var ins = data.instance;
+            var nodeSel = data.node;
+
+            _this.open_folder(nodeSel.original.nodeSvr);
+
+            if (nodeSel.children.length > 0) return;
+            var param = jQuery.extend({}, { pid: data.node.original.id, time: new Date().getTime() });
+            $.ajax({
+                type: "GET"
+                , dataType: "json"
+                , url: "index.jsp?op=tree"
+                , data: param
+                , success: function (res) {
+                    nodeSel.state.opened = true;
+
+                    $.each(res, function (i, n) {
+                        ins.create_node(nodeSel, n);
+                    });
+                }
+                , error: function (req, txt, err) { }
+                , complete: function (req, sta) { req = null; }
+            });
+        });
+    };
+    this.open_tree_node = function (data) {
+        var tree = $(_this.data.treeID).jstree(true);
+        tree.deselect_all(true);
+        var nodeCur = tree.get_node(data.f_id);
+        if (nodeCur == null) alert("未找到节点");
+        tree.select_node(nodeCur);
     };
 
     //加载未完成列表
@@ -198,6 +264,16 @@ function PageLogic() {
         this.data.up6.page_close();
         this.data.down2.page_close();
     };
+    this.open_folder = function (data) {
+        this.attr.ui.table.reload('files', {
+            url: 'index.jsp?op=data&pid=' + data.f_id //
+            , page: { curr: 1 }//第一页
+        });
+
+        $.extend(this.data.up6.Config.bizData, { "pid": data.f_id.replace(/\s*/g, ""), "pidRoot": data.f_pidRoot.replace(/\s*/g,"") });
+
+        _this.attr.event.path_changed(data);
+    };
 
     this.attr = {
         ui: {
@@ -262,14 +338,40 @@ function PageLogic() {
             file_post_complete: function () {
                 _this.attr.event.btn_refresh_click();
             }
-            , folder_post_complete: function () {
+            , folder_post_complete: function (obj) {
                 _this.attr.event.btn_refresh_click();
+                _this.attr.event.folder_created($.extend(obj.fileSvr
+                        , {
+                            f_pid: obj.fileSvr.pid
+                            , f_id: obj.fileSvr.id
+                            , f_pidRoot: obj.fileSvr.pidRoot
+                            , f_nameLoc: obj.fileSvr.nameLoc
+                    }));
             }
             , file_append: function (f) {
                 f.ui.path.text(_this.pathCur.f_nameLoc);
             }
             , folder_append: function (f) {
                 f.ui.path.text(_this.pathCur.f_nameLoc);
+            }
+            , folder_created: function (data)
+            {
+                var tree = $(_this.data.treeID).jstree(true);
+                if (data.f_pid == "") {
+                    tree.create_node("#", { id: data.f_id, text: data.f_nameLoc, nodeSvr: data });
+                }
+                else {
+                    var nodeSel = tree.get_node(data.f_pid);
+                    tree.create_node(nodeSel, { id: data.f_id, text: data.f_nameLoc, nodeSvr: data });
+                }
+            }
+            , folder_deleted: function (ids) {
+                var tree = $(_this.data.treeID).jstree(true);
+                tree.delete_node(ids);
+            }
+            , folder_renamed: function (data) {
+                var tree = $(_this.data.treeID).jstree(true);
+                tree.set_text(data.f_id, data.f_nameLoc);
             }
             , file_md5_complete: function (obj) {
                 obj.fileSvr.pid = _this.pathCur.f_id;
@@ -334,7 +436,13 @@ function PageLogic() {
                             , url: "index.jsp?op=mk-folder"
                             , data: param
                             , success: function (res) {
-                                _this.attr.event.btn_refresh_click();
+                                if (!res.ret) {
+                                    layer.alert('创建失败,'+res.msg, { icon: 5 });
+                                }
+                                else {
+                                    _this.attr.event.folder_created(res);
+                                    _this.attr.event.btn_refresh_click();
+                                }
                             }
                             , error: function (req, txt, err) { }
                             , complete: function (req, sta) { req = null; }
@@ -425,6 +533,7 @@ function PageLogic() {
                             , success: function (res) {
                                 _this.attr.event.btn_refresh_click();
                                 $(_this.attr.ui.btnDel).addClass("hide");
+                                _this.attr.event.folder_deleted(id_arr);
                             }
                             , error: function (req, txt, err) { }
                             , complete: function (req, sta) { req = null; }
@@ -493,7 +602,14 @@ function PageLogic() {
                             , url: "index.jsp?op=rename"
                             , data: param
                             , success: function (res) {
-                                obj.update({ "f_nameLoc": newData.f_nameLoc });
+                                if (res.state)
+                                {
+                                    obj.update({ "f_nameLoc": newData.f_nameLoc });
+                                    _this.attr.event.folder_renamed(data);
+                                }
+                                else {
+                                    layer.alert('更名失败,存在同名项', { icon: 5 });
+                                }
                             }
                             , error: function (req, txt, err) { }
                             , complete: function (req, sta) { req = null; }
@@ -531,10 +647,12 @@ function PageLogic() {
 
             }
             , table_file_click: function (obj, table) {
-                if (obj.data.f_fdTask) _this.attr.open_folder(obj.data, table);
+                if (obj.data.f_fdTask) {
+                    _this.open_folder(obj.data);
+                    _this.open_tree_node(obj.data);
+                }
             }
-            , path_changed: function (data) {
-                return;
+            , path_changed: function (data) {                
                 _this.pathCur = data;
                 $.ajax({
                     type: "GET"
@@ -558,19 +676,6 @@ function PageLogic() {
             , "rename": function (obj, table) { _this.attr.event.table_rename(obj, table); }
             , "file": function (obj, table) { _this.attr.event.table_file_click(obj, table); }
         }
-        , open_folder: function (data, table) {
-            return;
-            layui.use(['table'], function () {
-                var table = layui.table;
-                table.reload('files', {
-                    url: 'index.jsp?op=data&pid=' + data.f_id //
-                    , page: { curr: 1 }//第一页
-                });
-
-                _this.attr.event.path_changed(data);
-            });
-        }
-        
         , search: function (sql) {
             layui.use(['table'], function () {
                 var table = layui.table;
@@ -590,6 +695,7 @@ function PageLogic() {
             $(n.id).bind(n.e, n.n);
         });
         this.init_imgs();
+        this.init_path();
     };
     //
 }
@@ -598,4 +704,5 @@ $(function () {
     pageApp.init();
     pageApp.init_up6();
     pageApp.init_down2();
+    pageApp.init_tree();
 });

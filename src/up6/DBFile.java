@@ -5,7 +5,13 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+
+import org.apache.commons.lang.StringUtils;
+
 import up6.model.FileInf;
+import up6.sql.SqlExec;
+import up6.sql.SqlParam;
+
 import com.google.gson.Gson;
 
 /*
@@ -204,77 +210,50 @@ public class DBFile {
 	 * @param model
 	 * @return
 	 */
-	public void Add(FileInf model)
+	public void Add(FileInf f)
 	{
-		StringBuilder sb = new StringBuilder();
-		sb.append("insert into up6_files(");
-		sb.append(" f_id");//1
-		sb.append(",f_pid");//2
-		sb.append(",f_pidRoot");//3
-		sb.append(",f_fdTask");//4
-		sb.append(",f_fdChild");//5
-		sb.append(",f_uid");//6
-		sb.append(",f_pos");//7
-		sb.append(",f_md5");//8
-		sb.append(",f_lenLoc");//9
-		sb.append(",f_lenSvr");//10
-		sb.append(",f_perSvr");//11
-		sb.append(",f_sizeLoc");//12
-		sb.append(",f_nameLoc");//13
-		sb.append(",f_nameSvr");//14
-		sb.append(",f_pathLoc");//15
-		sb.append(",f_pathSvr");//16
-		sb.append(",f_pathRel");//17
-		sb.append(",f_complete");//18
-		
-		sb.append(") values(");
-		
-		sb.append(" ?");//id
-		sb.append(",?");//pid
-		sb.append(",?");//pidRoot
-		sb.append(",?");//fdTask
-		sb.append(",?");//fdChild
-		sb.append(",?");//uid
-		sb.append(",?");//pos
-		sb.append(",?");//md5
-		sb.append(",?");//lenLoc
-		sb.append(",?");//lenSvr
-		sb.append(",?");//perSvr
-		sb.append(",?");//sizeLoc
-		sb.append(",?");//nameLoc
-		sb.append(",?");//nameSvr
-		sb.append(",?");//pathLoc
-		sb.append(",?");//pathSvr
-		sb.append(",?");//pathRel
-		sb.append(",?");//complete
-		sb.append(")");
-
-		DbHelper db = new DbHelper();
-		PreparedStatement cmd = db.GetCommand(sb.toString());
-		try {
-			cmd.setString(1, model.id);
-			cmd.setString(2, model.pid);
-			cmd.setString(3, model.pidRoot);
-			cmd.setBoolean(4, model.fdTask);
-			cmd.setBoolean(5, model.fdChild);
-			cmd.setInt(6, model.uid);
-			cmd.setLong(7, model.offset);
-			cmd.setString(8, model.md5);
-			cmd.setLong(9, model.lenLoc);
-			cmd.setLong(10, model.lenSvr);
-			cmd.setString(11, model.perSvr);
-			cmd.setString(12, model.sizeLoc);
-			cmd.setString(13, model.nameLoc);
-			cmd.setString(14, model.nameSvr);			
-			cmd.setString(15, model.pathLoc);
-			cmd.setString(16, model.pathSvr);
-			cmd.setString(17, model.pathRel);
-			cmd.setBoolean(18, model.complete);
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		db.ExecuteNonQuery(cmd);
+		SqlExec se = new SqlExec();
+		se.insert("up6_files", new SqlParam[] {
+				new SqlParam("f_id",f.id)
+				,new SqlParam("f_pid",f.pid)
+				,new SqlParam("f_pidRoot",f.pidRoot)
+				,new SqlParam("f_fdTask",f.fdTask)
+				,new SqlParam("f_fdChild",f.fdChild)
+				,new SqlParam("f_uid",f.uid)
+				,new SqlParam("f_pos",f.offset)
+				,new SqlParam("f_md5",f.md5)
+				,new SqlParam("f_lenLoc",f.lenLoc)
+				,new SqlParam("f_lenSvr",f.lenSvr)
+				,new SqlParam("f_perSvr",f.perSvr)
+				,new SqlParam("f_sizeLoc",f.sizeLoc)
+				,new SqlParam("f_nameLoc",f.nameLoc)
+				,new SqlParam("f_nameSvr",f.nameSvr)
+				,new SqlParam("f_pathLoc",f.pathLoc)
+				,new SqlParam("f_pathSvr",f.pathSvr)
+				,new SqlParam("f_pathRel",f.pathRel)
+				,new SqlParam("f_complete",f.complete)
+		});
+	}
+	
+	/**
+	 * 添加子目录
+	 * @param f
+	 */
+	public void addFolderChild(FileInf f) 
+	{
+		SqlExec se = new SqlExec();
+		se.insert("up6_folders", new SqlParam[] {
+				 new SqlParam("f_id",f.id)
+				,new SqlParam("f_pid",f.pid)
+				,new SqlParam("f_pidRoot",f.pidRoot)
+				,new SqlParam("f_uid",f.uid)
+				,new SqlParam("f_lenLoc",f.lenLoc)
+				,new SqlParam("f_sizeLoc",f.sizeLoc)
+				,new SqlParam("f_nameLoc",f.nameLoc)
+				,new SqlParam("f_pathLoc",f.pathLoc)
+				,new SqlParam("f_pathSvr",f.pathSvr)
+				,new SqlParam("f_pathRel",f.pathRel)
+		});
 	}
 	
 	/**
@@ -339,20 +318,17 @@ public class DBFile {
 	///<param name="f_perSvr">已上传百分比</param>
 	public boolean f_process(int uid,String f_id,long offset,long f_lenSvr,String f_perSvr)
 	{
-		String sql = "update up6_files set f_pos=?,f_lenSvr=?,f_perSvr=? where f_uid=? and f_id=?";
-		
-		DbHelper db = new DbHelper();
-		PreparedStatement cmd = db.GetCommand(sql);
-		
-		try 
-		{
-			cmd.setLong(1, offset);
-			cmd.setLong(2, f_lenSvr);
-			cmd.setString(3, f_perSvr);
-			cmd.setInt(4, uid);
-			cmd.setString(5, f_id);
-			db.ExecuteNonQuery(cmd);
-		} catch (SQLException e) {e.printStackTrace();}
+		SqlExec se = new SqlExec();
+		se.update("up6_files"
+				, new SqlParam[] {
+						new SqlParam("f_pos",offset)
+						,new SqlParam("f_lenSvr",f_lenSvr)
+						,new SqlParam("f_perSvr",f_perSvr)
+						}
+				, new SqlParam[] {
+						new SqlParam("f_uid",uid)
+						,new SqlParam("f_id",f_id)
+				});
 
 		return true;
 	}

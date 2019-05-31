@@ -19,14 +19,17 @@ out.clear();
 		2016-04-09 完善逻辑。
 		2017-07-13 取消生成id操作
 */
-
-String id		= request.getParameter("id");
-String md5 		= request.getParameter("md5");
-String uid 		= request.getParameter("uid");
-String lenLoc 	= request.getParameter("lenLoc");//数字化的文件大小。12021
-String sizeLoc 	= request.getParameter("sizeLoc");//格式化的文件大小。10MB
-String callback = request.getParameter("callback");
-String pathLoc	= request.getParameter("pathLoc");
+WebBase web = new WebBase(pageContext);
+String pid      = web.queryString("pid");
+String pidRoot  = web.queryString("pidRoot");
+if(StringUtils.isBlank(pidRoot)) pidRoot = pid;//当前文件夹是根目录
+String id		= web.queryString("id");
+String md5 		= web.queryString("md5");
+String uid 		= web.queryString("uid");
+String lenLoc 	= web.queryString("lenLoc");//数字化的文件大小。12021
+String sizeLoc 	= web.queryString("sizeLoc");//格式化的文件大小。10MB
+String callback = web.queryString("callback");
+String pathLoc	= web.queryString("pathLoc");
 pathLoc			= PathTool.url_decode(pathLoc);
 
 //参数为空
@@ -40,6 +43,9 @@ if (	StringUtils.isBlank(md5)
 
 FileInf fileSvr= new FileInf();
 fileSvr.id = id;
+fileSvr.pid = pid;
+fileSvr.pidRoot = pidRoot;
+fileSvr.fdChild = !StringUtils.isBlank(pid);
 fileSvr.uid = Integer.parseInt(uid);
 fileSvr.nameLoc = PathTool.getName(pathLoc);
 fileSvr.pathLoc = pathLoc;
@@ -53,6 +59,17 @@ fileSvr.nameSvr = fileSvr.nameLoc;
 PathBuilderUuid pb = new PathBuilderUuid();
 fileSvr.pathSvr = pb.genFile(fileSvr.uid,fileSvr);
 fileSvr.pathSvr = fileSvr.pathSvr.replace("\\","/");
+
+
+//同名文件检测
+DbFolder df = new DbFolder();
+if (df.exist_same_file(fileSvr.nameLoc,pid))
+{
+    String data = callback + "({'value':'','ret':false,'code':'101'})";
+    WebBase wb = new WebBase(pageContext);
+    wb.toContent(data);
+    return;
+}
 
 DBConfig cfg = new DBConfig();
 DBFile db = cfg.db();
@@ -87,5 +104,5 @@ String json = gson.toJson(fileSvr);
 
 json = URLEncoder.encode(json,"UTF-8");//编码，防止中文乱码
 json = json.replace("+","%20");
-json = callback + "({\"value\":\"" + json + "\"})";//返回jsonp格式数据。
+json = callback + "({\"value\":\"" + json + "\",\"ret\":true})";//返回jsonp格式数据。
 out.write(json);%>

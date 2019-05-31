@@ -89,6 +89,8 @@ try
 catch(Exception e)
 {
 	response.setStatus(500);
+	os.close();
+	out.close();
 	e.printStackTrace();
 }
 finally

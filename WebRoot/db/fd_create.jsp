@@ -7,6 +7,7 @@
 <%@ page import="org.apache.commons.lang.StringUtils" %>
 <%@ page import="java.net.URLDecoder" %>
 <%@ page import="java.net.URLEncoder" %>
+<%@ page import="net.sf.json.*" %>
 <%
 out.clear();
 /*
@@ -49,13 +50,17 @@ out.clear();
 String path = request.getContextPath();
 String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.getServerPort()+path+"/";
 
-String id = request.getParameter("id");
-String uid = request.getParameter("uid");
-String lenLoc = request.getParameter("lenLoc");
-String sizeLoc = request.getParameter("sizeLoc");
-String pathLoc = request.getParameter("pathLoc");
-pathLoc = URLDecoder.decode(pathLoc,"UTF-8");//utf-8解码
-String callback = request.getParameter("callback");//jsonp
+WebBase web     = new WebBase(pageContext);
+String id       = web.queryString("id");
+String pid      = web.queryString("pid");
+String pidRoot  = web.queryString("pidRoot");
+if( StringUtils.isBlank(pidRoot)) pidRoot = pid;//父目录是根目录
+String uid      = web.queryString("uid");
+String lenLoc   = web.queryString("lenLoc");
+String sizeLoc  = web.queryString("sizeLoc");
+String pathLoc  = web.queryString("pathLoc");
+pathLoc         = URLDecoder.decode(pathLoc,"UTF-8");//utf-8解码
+String callback = web.queryString("callback");//jsonp
 
 
 //参数为空
@@ -67,17 +72,32 @@ if (StringUtils.isBlank(id)
 	return;
 }
 
-FileInf fileSvr= new FileInf();
-fileSvr.id = id;
+FileInf fileSvr = new FileInf();
+fileSvr.id      = id;
+fileSvr.pid     = pid;
+fileSvr.pidRoot = pidRoot;
 fileSvr.fdChild = false;
-fileSvr.fdTask = true;
-fileSvr.uid = Integer.parseInt(uid);
+fileSvr.fdTask  = true;
+fileSvr.uid     = Integer.parseInt(uid);
 fileSvr.nameLoc = PathTool.getName(pathLoc);
 fileSvr.pathLoc = pathLoc;
-fileSvr.lenLoc = Long.parseLong(lenLoc);
+fileSvr.lenLoc  = Long.parseLong(lenLoc);
 fileSvr.sizeLoc = sizeLoc;
 fileSvr.deleted = false;
 fileSvr.nameSvr = fileSvr.nameLoc;
+
+//检查同名目录
+DbFolder df = new DbFolder();
+if (df.exist_same_folder(fileSvr.nameLoc, pid))
+{
+	JSONObject o = new JSONObject();
+	o.put("value","");
+	o.put("ret", false);
+	o.put("code", "102");    
+    String js = callback + String.format("(%s)", o.toString());
+    web.toContent(js);
+    return;
+}
 
 //生成存储路径
 PathBuilderUuid pb = new PathBuilderUuid();
@@ -88,12 +108,17 @@ PathTool.createDirectory(fileSvr.pathSvr);
 //添加到数据表
 DBConfig cfg = new DBConfig();
 DBFile db = cfg.db();
-db.Add(fileSvr);
+if(StringUtils.isBlank(pid)) db.Add(fileSvr);
+else db.addFolderChild(fileSvr);
 up6_biz_event.folder_create(fileSvr);
 
 Gson g = new Gson();
 String json = g.toJson(fileSvr);
 json = URLEncoder.encode(json,"utf-8");
 json = json.replace("+","%20");
-json = callback + "({\"value\":\"" + json + "\"})";//返回jsonp格式数据。
+
+JSONObject ret = new JSONObject();
+ret.put("value",json);
+ret.put("ret",true);
+json = callback + String.format("(%s)",ret.toString());//返回jsonp格式数据。
 out.write(json);%>

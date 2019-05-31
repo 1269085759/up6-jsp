@@ -5,6 +5,9 @@ import java.util.Enumeration;
 import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.jsp.PageContext;
+
+import org.apache.commons.lang.StringUtils;
+
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
@@ -120,6 +123,14 @@ public class WebBase {
         HtmlTemplate ht = new HtmlTemplate();
         ht.setFile(file);
         return ht.toString();
+    }
+    
+    public String queryString(String n) 
+    {
+    	String v = this.m_pc.getRequest().getParameter(n);
+    	if(StringUtils.isBlank(v)) v = "";
+    	v = v.trim();
+    	return v;
     }
     
     /**

@@ -44,9 +44,17 @@ function FileUploader(fileLoc, mgr)
 
     this.svr_error = function ()
     {
+    	this.Manager.RemoveQueuePost(this.fileSvr.id);
         alert("服务器返回信息为空，请检查服务器配置");
         this.ui.msg.text("向服务器发送MD5信息错误");
-        this.ui.btn.cancel.text("续传");
+        this.ui.btn.stop.hide();
+        this.ui.btn.cancel.show();
+    };
+    this.svr_error_same_name = function () {
+        this.Manager.RemoveQueuePost(this.fileSvr.id);
+        this.ui.msg.text("服务器存在同名文件");
+        this.ui.btn.stop.hide();
+        this.ui.btn.cancel.show();
     };
     this.svr_create = function (sv)
     {
@@ -54,6 +62,11 @@ function FileUploader(fileLoc, mgr)
         {
             this.svr_error(); return;
         }
+        if (!sv.ret) {
+            this.svr_error_same_name(); 
+            return;
+        }
+        
 
         var str = decodeURIComponent(sv.value);//
         this.fileSvr = JSON.parse(str);//
@@ -195,7 +208,7 @@ function FileUploader(fileLoc, mgr)
         var loc_path = encodeURIComponent(this.fileSvr.pathLoc);
         var loc_len = this.fileSvr.lenLoc;
         var loc_size = this.fileSvr.sizeLoc;
-        var param = jQuery.extend({}, this.fields, { md5: json.md5, id: this.fileSvr.id, lenLoc: loc_len, sizeLoc: loc_size, pathLoc: loc_path, time: new Date().getTime() });
+        var param = jQuery.extend({}, this.fields,this.Config.bizData, { md5: json.md5, id: this.fileSvr.id, lenLoc: loc_len, sizeLoc: loc_size, pathLoc: loc_path, time: new Date().getTime() });
 
         $.ajax({
             type: "GET"
@@ -209,9 +222,11 @@ function FileUploader(fileLoc, mgr)
             }
             , error: function (req, txt, err)
             {
+                _this.Manager.RemoveQueuePost(_this.fileSvr.id);
                 alert("向服务器发送MD5信息错误！" + req.responseText);
                 _this.ui.msg.text("向服务器发送MD5信息错误");
-                _this.ui.btn.del.text("续传");
+                _this.ui.btn.cancel.show();
+                _this.ui.btn.stop.hide();
             }
             , complete: function (req, sta) { req = null; }
         });
