@@ -420,7 +420,7 @@ function FolderUploader(fdLoc, mgr)
         this.manager.del_file(this.fileSvr.id);
         this.app.delFolder({ id: this.id });
         this.manager.Delete(this.id);
-        this.svr_remove();
+        if (this.State != this.Config.state.Complete) this.svr_remove();
         this.ui.div.remove();
     };
 }
