@@ -40,6 +40,32 @@ function FileUploader(fileLoc, mgr)
     {
         this.ui.msg.text("正在上传队列中等待...");
         this.State = this.Config.state.Ready;
+        this.ui.btn.post.click(function () {
+            _this.ui.btn.post.hide();
+            _this.ui.btn.del.hide();
+            _this.ui.btn.cancel.hide();
+            _this.ui.btn.stop.show();
+            if (!_this.Manager.IsPostQueueFull()) {
+                _this.post();
+            }
+            else {
+                _this.Ready();
+                //添加到队列
+                _this.Manager.AppendQueue(_this.fileSvr.id);
+            }
+        });
+        this.ui.btn.stop.click(function () {
+            _this.stop();
+        });
+        this.ui.btn.del.click(function () {
+            _this.stop();
+            _this.remove();
+        });
+        this.ui.btn.cancel.click(function () {
+            _this.stop();
+            _this.remove();
+            //_this.PostFirst();//
+        });
     };
 
     this.svr_error = function ()
@@ -97,7 +123,7 @@ function FileUploader(fileLoc, mgr)
     };
     this.svr_remove = function ()
     {
-        var param = { uid: this.fields["uid"], id: this.id, time: new Date().getTime() };
+        var param = { uid: this.fields["uid"], id: this.fileSvr.id, time: new Date().getTime() };
         $.ajax({
             type: "GET"
             , dataType: 'jsonp'
