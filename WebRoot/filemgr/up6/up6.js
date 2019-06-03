@@ -44,11 +44,11 @@ function HttpUploaderMgr()
         , "ProcSaveTm"      : 60//定时保存进度。单位：秒，默认：1分钟
         , "AutoConnect"     : {opened:false,time:3000}//启动错误自动重传
 		//文件夹操作相关
-		, "UrlFdCreate"		: page.path.root + "db/fd_create.jsp"
+		, "UrlFdCreate"		: page.path.root + "filemgr/index.jsp?op=fd_create"
 		, "UrlFdComplete"	: page.path.root + "db/fd_complete.jsp"
 		, "UrlFdDel"	    : page.path.root + "db/fd_del.jsp"
 		//文件操作相关
-		, "UrlCreate"		: page.path.root + "db/f_create.jsp"
+		, "UrlCreate"		: page.path.root + "filemgr/index.jsp?op=f_create"
 		, "UrlPost"			: page.path.root + "db/f_post.jsp"
         , "UrlProcess"		: page.path.root + "db/f_process.jsp"
 		, "UrlComplete"		: page.path.root + "db/f_complete.jsp"

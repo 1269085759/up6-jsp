@@ -1,16 +1,26 @@
 package up6.biz;
 
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
 import java.util.UUID;
 
 import javax.servlet.jsp.PageContext;
 
 import org.apache.commons.lang.StringUtils;
 
+import com.google.gson.Gson;
+
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
+import up6.DBConfig;
+import up6.DBFile;
 import up6.DbFolder;
+import up6.FileBlockWriter;
 import up6.PathTool;
 import up6.WebBase;
+import up6.model.FileInf;
 import up6.sql.SqlExec;
 import up6.sql.SqlParam;
 import up6.sql.SqlWhereMerge;
@@ -41,8 +51,197 @@ public class PageFileMgr {
 		else if(StringUtils.equals("uncomp", op)) this.uncomp();
 		else if(StringUtils.equals("uncmp-down", op)) this.uncmp_down();
 		else if(StringUtils.equals("tree", op)) this.load_tree();
+		else if(StringUtils.equals("f_create", op)) this.f_create();
+		else if(StringUtils.equals("fd_create", op)) this.fd_create();
 	}
 
+	void f_create() 
+	{
+		String pid      = this.m_wb.queryString("pid");
+		String pidRoot  = this.m_wb.queryString("pidRoot");
+		if(StringUtils.isBlank(pidRoot)) pidRoot = pid;//当前文件夹是根目录
+		String id		= this.m_wb.queryString("id");
+		String md5 		= this.m_wb.queryString("md5");
+		String uid 		= this.m_wb.queryString("uid");
+		String lenLoc 	= this.m_wb.queryString("lenLoc");//数字化的文件大小。12021
+		String sizeLoc 	= this.m_wb.queryString("sizeLoc");//格式化的文件大小。10MB
+		String callback = this.m_wb.queryString("callback");
+		String pathLoc	= this.m_wb.queryString("pathLoc");
+		pathLoc			= PathTool.url_decode(pathLoc);
+		
+		//参数为空
+		if (	StringUtils.isBlank(md5)
+			&& StringUtils.isBlank(uid)
+			&& StringUtils.isBlank(sizeLoc))
+		{
+			this.m_wb.toContent(callback + "({\"value\":null})");	
+			return;
+		}
+		
+		FileInf fileSvr= new FileInf();
+		fileSvr.id = id;
+		fileSvr.pid = pid;
+		fileSvr.pidRoot = pidRoot;
+		fileSvr.fdChild = !StringUtils.isBlank(pid);
+		fileSvr.uid = Integer.parseInt(uid);
+		fileSvr.nameLoc = PathTool.getName(pathLoc);
+		fileSvr.pathLoc = pathLoc;
+		fileSvr.lenLoc = Long.parseLong(lenLoc);
+		fileSvr.sizeLoc = sizeLoc;
+		fileSvr.deleted = false;
+		fileSvr.md5 = md5;
+		fileSvr.nameSvr = fileSvr.nameLoc;
+		
+		//所有单个文件均以uuid/file方式存储
+		PathBuilderUuid pb = new PathBuilderUuid();
+		try {
+			fileSvr.pathSvr = pb.genFile(fileSvr.uid,fileSvr);
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		fileSvr.pathSvr = fileSvr.pathSvr.replace("\\","/");
+		
+		
+		//同名文件检测
+		DbFolder df = new DbFolder();
+		if (df.exist_same_file(fileSvr.nameLoc,pid))
+		{
+		    String data = callback + "({'value':'','ret':false,'code':'101'})";    
+		    this.m_wb.toContent(data);
+		    return;
+		}
+		
+		DBConfig cfg = new DBConfig();
+		DBFile db = cfg.db();
+		FileInf fileExist = new FileInf();
+			
+		boolean exist = db.exist_file(md5,fileExist);
+		//数据库已存在相同文件，且有上传进度，则直接使用此信息
+		if(exist && fileExist.lenSvr > 1)
+		{
+			fileSvr.nameSvr			= fileExist.nameSvr;
+			fileSvr.pathSvr 		= fileExist.pathSvr;
+			fileSvr.perSvr 			= fileExist.perSvr;
+			fileSvr.lenSvr 			= fileExist.lenSvr;
+			fileSvr.complete		= fileExist.complete;
+			db.Add(fileSvr);
+			
+			//触发事件
+		    up6_biz_event.file_create_same(fileSvr);
+		}//此文件不存在
+		else
+		{
+			db.Add(fileSvr);
+			//触发事件
+		    up6_biz_event.file_create(fileSvr);
+			
+			FileBlockWriter fr = new FileBlockWriter();
+			fr.CreateFile(fileSvr.pathSvr,fileSvr.lenLoc);
+		}
+		
+		Gson gson = new Gson();
+		String json = gson.toJson(fileSvr);
+		
+		try {
+			json = URLEncoder.encode(json,"UTF-8");
+		} catch (UnsupportedEncodingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}//编码，防止中文乱码
+		json = json.replace("+","%20");
+		json = callback + "({\"value\":\"" + json + "\",\"ret\":true})";//返回jsonp格式数据。
+		this.m_wb.toContent(json);
+		
+	}
+	void fd_create() {
+		String id       = this.m_wb.queryString("id");
+		String pid      = this.m_wb.queryString("pid");
+		String pidRoot  = this.m_wb.queryString("pidRoot");
+		if( StringUtils.isBlank(pidRoot)) pidRoot = pid;//父目录是根目录
+		String uid      = this.m_wb.queryString("uid");
+		String lenLoc   = this.m_wb.queryString("lenLoc");
+		String sizeLoc  = this.m_wb.queryString("sizeLoc");
+		String pathLoc  = this.m_wb.queryString("pathLoc");
+		try {
+			pathLoc         = URLDecoder.decode(pathLoc,"UTF-8");
+		} catch (UnsupportedEncodingException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}//utf-8解码
+		String callback = this.m_wb.queryString("callback");//jsonp
+		
+		
+		//参数为空
+		if (StringUtils.isBlank(id)
+			|| StringUtils.isBlank(uid)
+			|| StringUtils.isBlank(pathLoc))
+		{
+			this.m_wb.toContent(callback + "({\"value\":null})");
+			return;
+		}
+		
+		FileInf fileSvr = new FileInf();
+		fileSvr.id      = id;
+		fileSvr.pid     = pid;
+		fileSvr.pidRoot = pidRoot;
+		fileSvr.fdChild = false;
+		fileSvr.fdTask  = true;
+		fileSvr.uid     = Integer.parseInt(uid);
+		fileSvr.nameLoc = PathTool.getName(pathLoc);
+		fileSvr.pathLoc = pathLoc;
+		fileSvr.lenLoc  = Long.parseLong(lenLoc);
+		fileSvr.sizeLoc = sizeLoc;
+		fileSvr.deleted = false;
+		fileSvr.nameSvr = fileSvr.nameLoc;
+		
+		//检查同名目录
+		DbFolder df = new DbFolder();
+		if (df.exist_same_folder(fileSvr.nameLoc, pid))
+		{
+			JSONObject o = new JSONObject();
+			o.put("value","");
+			o.put("ret", false);
+			o.put("code", "102");    
+		    String js = callback + String.format("(%s)", o.toString());    
+		    this.m_wb.toContent(js);
+		    return;
+		}
+		
+		//生成存储路径
+		PathBuilderUuid pb = new PathBuilderUuid();
+		try {
+			fileSvr.pathSvr = pb.genFolder(fileSvr);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		fileSvr.pathSvr = fileSvr.pathSvr.replace("\\","/");
+		PathTool.createDirectory(fileSvr.pathSvr);
+		
+		//添加到数据表
+		DBConfig cfg = new DBConfig();
+		DBFile db = cfg.db();
+		if(StringUtils.isBlank(pid)) db.Add(fileSvr);
+		else db.addFolderChild(fileSvr);
+		up6_biz_event.folder_create(fileSvr);
+		
+		Gson g = new Gson();
+		String json = g.toJson(fileSvr);
+		try {
+			json = URLEncoder.encode(json,"utf-8");
+		} catch (UnsupportedEncodingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		json = json.replace("+","%20");
+		
+		JSONObject ret = new JSONObject();
+		ret.put("value",json);
+		ret.put("ret",true);
+		json = callback + String.format("(%s)",ret.toString());//返回jsonp格式数据。
+		this.m_wb.toContent(json);
+	}
 
     void mk_folder()
     {
