@@ -1,16 +1,19 @@
-<%@ page language="java" import="java.util.*" pageEncoding="UTF-8"%><%@ 
-	page contentType="text/html;charset=UTF-8"%><%@ 
-	page import="down2.model.*" %><%@
-	page import="down2.biz.*" %><%@
-	page import="up6.*" %><%@ 
-	page import="java.net.URLDecoder" %><%@ 
-	page import="java.net.URLEncoder" %><%@ 
-	page import="org.apache.commons.lang.*" %><%@ 
-	page import="com.google.gson.FieldNamingPolicy" %><%@ 
-	page import="com.google.gson.Gson" %><%@ 
-	page import="com.google.gson.GsonBuilder" %><%@ 
-	page import="com.google.gson.annotations.SerializedName" %><%@ 
-	page import="java.io.*" %><%/*
+<%@ page language="java" import="java.util.*" pageEncoding="UTF-8"%>
+<%@ page contentType="text/html;charset=UTF-8"%>
+<%@ page import="down2.model.*" %>
+<%@ page import="down2.biz.*" %>
+<%@ page import="up6.*" %>
+<%@ page import="java.net.URLDecoder" %>
+<%@ page import="java.net.URLEncoder" %>
+<%@ page import="org.apache.commons.lang.*" %>
+<%@ page import="com.google.gson.FieldNamingPolicy" %>
+<%@ page import="com.google.gson.Gson" %>
+<%@ page import="com.google.gson.GsonBuilder" %>
+<%@ page import="com.google.gson.annotations.SerializedName" %>
+<%@ page import="java.io.*" %>
+<%
+out.clear();
+/*
 	此页面主要用来向数据库添加一条记录。
 	一般在 HttpUploader.js HttpUploader_MD5_Complete(obj) 中调用
 	更新记录：

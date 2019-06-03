@@ -6,8 +6,12 @@ import java.util.ArrayList;
 import java.util.UUID;
 
 import up6.DbHelper;
+import up6.sql.SqlExec;
+import up6.sql.SqlParam;
+
 import com.google.gson.Gson;
 import down2.model.DnFileInf;
+import net.sf.json.JSONObject;
 
 public class DnFile 
 {
@@ -17,46 +21,19 @@ public class DnFile
 	
     public void Add(down2.model.DnFileInf inf)
     {
-        StringBuilder sb = new StringBuilder();
-        sb.append("insert into down_files(");        
-        sb.append(" f_id");
-        sb.append(",f_uid");
-        sb.append(",f_nameLoc");
-        sb.append(",f_pathLoc");
-        sb.append(",f_fileUrl");
-        sb.append(",f_lenSvr");
-        sb.append(",f_sizeSvr");
-        sb.append(",f_fdTask");
-        
-        sb.append(") values(");
-        
-        sb.append(" ?");//id
-        sb.append(",?");//uid
-        sb.append(",?");//nameLoc
-        sb.append(",?");//pathLoc
-        sb.append(",?");//fileUrl
-        sb.append(",?");//lenSvr
-        sb.append(",?");//sizeSvr
-        sb.append(",?");//fdTask
-        sb.append(")");
-		
-		DbHelper db = new DbHelper();
-		PreparedStatement cmd = db.GetCommand(sb.toString());
-
-		try
-		{
-			cmd.setString(1,inf.id);
-			cmd.setInt(2,inf.uid);
-			cmd.setString(3,inf.nameLoc);
-			cmd.setString(4,inf.pathLoc);
-			cmd.setString(5,inf.fileUrl);
-			cmd.setLong(6,inf.lenSvr);
-			cmd.setString(7,inf.sizeSvr);
-			cmd.setBoolean(8,inf.fdTask);
-			db.ExecuteNonQuery(cmd);			
-		}
-		catch (SQLException e){e.printStackTrace();}	
-
+    	SqlExec se = new SqlExec();
+    	se.insert("down_files"
+    			,new SqlParam[] {
+    					new SqlParam("f_id",inf.id)
+    					,new SqlParam("f_uid",inf.uid)
+    					,new SqlParam("f_nameLoc",inf.nameLoc)
+    					,new SqlParam("f_pathLoc",inf.pathLoc)
+    					,new SqlParam("f_fileUrl",inf.fileUrl)
+    					,new SqlParam("f_lenSvr",inf.lenSvr)
+    					,new SqlParam("f_sizeSvr",inf.sizeSvr)
+    					,new SqlParam("f_fdTask",inf.fdTask)
+    			}
+    			);
     }
 
     /**
@@ -65,17 +42,11 @@ public class DnFile
      */
     public void Complete(String fid)
     {
-		DbHelper db = new DbHelper();
-		PreparedStatement cmd = db.GetCommand("update down_files set f_complete=1 where f_id=?");
-		try
-		{
-			cmd.setString(1,fid);
-		}
-		catch (SQLException e)
-		{
-			e.printStackTrace();
-		}
-		db.ExecuteNonQuery(cmd);
+    	SqlExec se = new SqlExec();
+    	se.update("down_files"
+    			, new SqlParam[] {new SqlParam("f_complete",1)}
+    			, new SqlParam[] {new SqlParam("f_id",fid)}
+    			);
     }
 
     /// <summary>
@@ -84,17 +55,8 @@ public class DnFile
     /// <param name="fid"></param>
     public void Delete(String fid,int uid)
     {
-        String sql = "delete from down_files where f_id=? and f_uid=?";
-        DbHelper db = new DbHelper();
-		PreparedStatement cmd = db.GetCommand(sql);
-
-		try
-		{
-			cmd.setString(1,fid);
-			cmd.setInt(2,uid);			
-			db.ExecuteNonQuery(cmd);
-		}
-		catch (SQLException e){e.printStackTrace();}
+    	SqlExec se = new SqlExec();
+    	se.delete("down_files", new SqlParam[] {new SqlParam("f_id",fid),new SqlParam("f_uid",uid)});
     }
     
     /**
@@ -106,23 +68,17 @@ public class DnFile
      */
     public void process(String fid,int uid,String lenLoc,String perLoc)
     {
-        String sql = "update down_files set f_lenLoc=?,f_perLoc=? where f_id=? and f_uid=?";
-        DbHelper db = new DbHelper();
-		PreparedStatement cmd = db.GetCommand(sql);
-
-		try
-		{
-			cmd.setString(1,lenLoc);
-			cmd.setString(2,perLoc);
-			cmd.setString(3,fid);
-			cmd.setInt(4,uid);
-			
-			db.ExecuteNonQuery(cmd);
-		}
-		catch (SQLException e)
-		{
-			e.printStackTrace();
-		}
+    	SqlExec se = new SqlExec();
+    	se.update("down_files"
+    			, new SqlParam[] {
+    					new SqlParam("f_lenLoc",Long.parseLong( lenLoc ))
+    					,new SqlParam("f_perLoc",perLoc)
+    					}
+    			, new SqlParam[] {
+    					new SqlParam("f_id",fid)
+    					,new SqlParam("f_uid",uid)
+    					}
+    			);
     }
 
     /// <summary>
@@ -225,45 +181,5 @@ public class DnFile
     {
 		DbHelper db = new DbHelper();
 		db.ExecuteNonQuery("truncate table down_files");
-    }
-    
-    public String all_file(String id)
-    {
-    	StringBuilder sb = new StringBuilder();
-        sb.append("select ");
-        sb.append(" f_id");
-        sb.append(",f_nameLoc");
-        sb.append(",f_pathSvr");
-        sb.append(",f_pathRel");
-        sb.append(",f_lenSvr");
-        sb.append(",f_sizeLoc");        
-        sb.append(" from up6_files");
-        sb.append(" where f_pidRoot=?");
-
-        ArrayList<DnFileInf> files = new ArrayList<DnFileInf>();
-		DbHelper db = new DbHelper();
-		PreparedStatement cmd = db.GetCommand(sb.toString());
-		try
-		{
-			cmd.setString(1,id);
-			ResultSet r = db.ExecuteDataSet(cmd);
-			while (r.next())
-			{
-				DnFileInf f		= new DnFileInf();
-				f.f_id			= r.getString(1);
-				f.nameLoc		= r.getString(2);
-				f.pathSvr		= r.getString(3);
-				f.pathRel		= r.getString(4);
-				f.lenSvr		= r.getLong(5);
-				f.sizeSvr		= r.getString(6);
-			    
-				files.add(f);
-			}
-			cmd.close();//auto close ResultSet
-		}
-		catch (SQLException e){e.printStackTrace();}
-
-        Gson g = new Gson();
-	    return g.toJson( files );	
     }
 }

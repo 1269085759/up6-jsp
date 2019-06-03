@@ -1,9 +1,10 @@
-<%@ page language="java" import="up6.DBFile" pageEncoding="UTF-8"%><%@
-	page contentType="text/html;charset=UTF-8"%><%@ 
-	page import="up6.biz.*" %><%@
-	page import="up6.DBConfig" %><%@
-	page import="org.apache.commons.lang.StringUtils" %><%
-
+<%@ page language="java" import="up6.DBFile" pageEncoding="UTF-8"%>
+<%@ page contentType="text/html;charset=UTF-8"%>
+<%@ page import="up6.biz.*" %>
+<%@ page import="up6.DBConfig" %>
+<%@ page import="org.apache.commons.lang.StringUtils" %>
+<%
+out.clear();
 /*
 	更新文件进度或文件夹进度，百分比
 */

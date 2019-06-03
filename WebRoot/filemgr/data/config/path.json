@@ -30,8 +30,8 @@
         "http://localhost:8080/up6/filemgr/res/bootstrap/css/bootstrap.min.css"
     ],
     "jstree": [
-        "https://cdn.bootcss.com/jstree/3.3.5/themes/default/style.min.css",
-        "https://cdn.bootcss.com/jstree/3.3.5/jstree.min.js"
+        "http://localhost:8080/up6/filemgr/res/jstree/themes/default/style.min.css",
+        "http://localhost:8080/up6/filemgr/res/jstree/jstree.min.js"
     ],
     "layerui": [
         "http://localhost:8080/up6/filemgr/res/layui/css/layui.css",

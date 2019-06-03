@@ -18,7 +18,7 @@ import down2.biz.DnFileSQL;
  *
  */
 public class DBConfig {
-	String m_db="sql";//sql,oracle,mysql
+	public String m_db="sql";//sql,oracle,mysql
 	
 	String driver = "";
 	String url = "";

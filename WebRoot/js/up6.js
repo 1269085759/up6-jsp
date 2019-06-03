@@ -4,7 +4,7 @@
 	产品首页：http://www.ncmem.com/webapp/up6/index.aspx
 	联系信箱：1085617561@qq.com
 	联系QQ：1085617561
-    版本：2.3.7
+    版本：2.3.8
 	更新记录：
 		2009-11-05 创建。
 		2015-07-31 优化更新进度逻辑
@@ -483,7 +483,7 @@ function HttpUploaderMgr()
 
     //删除文件对象
     this.del_file = function (id) {
-        this.filesMap = $.grep(this.filesMap, function (i, n) {
+        $.grep(this.filesMap, function (i, n) {
             return i == id;
         },true);
     };
@@ -835,7 +835,7 @@ function HttpUploaderMgr()
     //从上传队列删除
 	this.RemoveQueuePost = function (fid) {
 	    if (_this.QueuePost.length < 1) return;
-	    this.QueuePost = $.grep(this.QueuePost, function (n, i) {
+	    $.grep(this.QueuePost, function (n, i) {
             return n == fid;
         }, true);
 	};
@@ -850,7 +850,7 @@ function HttpUploaderMgr()
 	this.RemoveQueue = function(fid)
 	{ 
 	    if (this.QueueFiles.length < 1) return;
-	    this.QueueFiles = $.grep(this.QueueFiles, function (n, i) {
+	    $.grep(this.QueueFiles, function (n, i) {
             return n == fid;
         }, true);
 	};
@@ -865,7 +865,7 @@ function HttpUploaderMgr()
 	this.RemoveQueueWait = function(fid)
 	{ 
 	    if (this.QueueWait.length < 1) return;
-	    this.QueueWait = $.grep(this.QueueWait, function (n, i) {
+	    $.grep(this.QueueWait, function (n, i) {
             return n == fid;
         }, true);
 	};

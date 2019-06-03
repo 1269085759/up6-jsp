@@ -4,13 +4,14 @@ import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.util.UUID;
 
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang.StringUtils;
 
 public class PathTool {
-
+	
 	public static String getName(String n){
 		File f = new File(n);
 		return f.getName();

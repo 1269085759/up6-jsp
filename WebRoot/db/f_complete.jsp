@@ -1,7 +1,9 @@
-<%@ page language="java" import="up6.*" pageEncoding="UTF-8"%><%@
-	page contentType="text/html;charset=UTF-8"%><%@ 
-	page import="up6.biz.*" %><%@
-	page import="org.apache.commons.lang.StringUtils" %><%
+<%@ page language="java" import="up6.*" pageEncoding="UTF-8"%>
+<%@ page contentType="text/html;charset=UTF-8"%>
+<%@ page import="up6.biz.*" %>
+<%@ page import="org.apache.commons.lang.StringUtils" %>
+<%
+out.clear();
 /*
 	此页面主要用来向数据库添加一条记录。
 	一般在 HttpUploader.js HttpUploader_MD5_Complete(obj) 中调用

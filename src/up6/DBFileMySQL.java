@@ -156,7 +156,7 @@ public class DBFileMySQL extends DBFile
 			Statement stmt = con.createStatement();
 			stmt.addBatch("update up6_files set f_perSvr='100%' ,f_lenSvr=f_lenLoc,f_complete=1 where f_id='" + f_id+"'");
 			stmt.addBatch("update up6_files set f_perSvr='100%' ,f_lenSvr=f_lenLoc,f_complete=1 where f_pidRoot='" + f_id+"'");
-			stmt.addBatch("update up6_folders set fd_complete=1 where fd_id='" + f_id + "' and fd_uid=" + uid);
+			stmt.addBatch("update up6_folders set f_complete=1 where f_id='" + f_id + "' and f_uid=" + uid);
 			stmt.executeBatch();
 			con.commit();
 			stmt.close();
@@ -193,7 +193,7 @@ public class DBFileMySQL extends DBFile
 			Statement stmt = con.createStatement();
 			stmt.addBatch("update up6_files set f_deleted=1 where f_id='" + id + "' and f_uid=" + uid);
 			stmt.addBatch("update up6_files set f_deleted=1 where f_pidRoot='" + id + "' and f_uid=" + uid);
-			stmt.addBatch("update up6_folders set fd_delete=1 where fd_id='" + id + "' and fd_uid=" + uid);
+			stmt.addBatch("update up6_folders set f_deleted=1 where f_id='" + id + "' and f_uid=" + uid);
 			stmt.executeBatch();
 			con.commit();
 			stmt.close();

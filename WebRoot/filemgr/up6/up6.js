@@ -87,6 +87,7 @@ function HttpUploaderMgr()
         , exe: { path: "http://www.ncmem.com/download/up6.3/up6.exe" }
 		, "SetupPath": "http://localhost:4955/demoAccess/js/setup.htm"
         , "Fields": {"uname": "test","upass": "test","uid":"0"}
+        , bizData: {pid:"",pidRoot:""}
         , errCode: {
             "0": "发送数据错误"
             , "1": "接收数据错误"
@@ -106,6 +107,8 @@ function HttpUploaderMgr()
             , "15": "文件块MD5不匹配"
             , "16": "读取文件夹配置信息失败"
             , "100": "服务器错误"
+            , "101": "存在同名文件"
+            , "102": "存在同名目录"
         }
         , state: {
             Ready: 0,
@@ -251,7 +254,7 @@ function HttpUploaderMgr()
 
     //删除文件对象
     this.del_file = function (id) {
-        this.filesMap = $.grep(this.filesMap, function (i, n) {
+        $.grep(this.filesMap, function (i, n) {
             return i == id;
         },true);
     };
@@ -460,6 +463,13 @@ function HttpUploaderMgr()
 		});
 	};
 
+    this.page_close = function () {
+        if (this.edge) _this.edgeApp.close();
+        if (_this.QueuePost.length > 0) {
+            _this.StopAll();
+        }
+    };
+
 	this.loadAuto = function ()
 	{
 	    var dom = $(document.body).append(this.getHtml());
@@ -560,7 +570,7 @@ function HttpUploaderMgr()
     //从上传队列删除
 	this.RemoveQueuePost = function (fid) {
 	    if (_this.QueuePost.length < 1) return;
-	    this.QueuePost = $.grep(this.QueuePost, function (n, i) {
+	    $.grep(this.QueuePost, function (n, i) {
             return n == fid;
         }, true);
 	};
@@ -575,7 +585,7 @@ function HttpUploaderMgr()
 	this.RemoveQueue = function(fid)
 	{ 
 	    if (this.QueueFiles.length < 1) return;
-	    this.QueueFiles = $.grep(this.QueueFiles, function (n, i) {
+	    $.grep(this.QueueFiles, function (n, i) {
             return n == fid;
         }, true);
 	};
@@ -590,7 +600,7 @@ function HttpUploaderMgr()
 	this.RemoveQueueWait = function(fid)
 	{ 
 	    if (this.QueueWait.length < 1) return;
-	    this.QueueWait = $.grep(this.QueueWait, function (n, i) {
+	    $.grep(this.QueueWait, function (n, i) {
             return n == fid;
         }, true);
 	};
@@ -784,34 +794,6 @@ function HttpUploaderMgr()
 		ui.size.text(fileLoc.sizeLoc);
 		ui.msg.text("");
 		ui.percent.text("(0%)");
-		ui.btn.cancel.click(function()
-		{
-			upFile.stop();
-			upFile.remove();
-			_this.PostFirst();//
-		});
-		ui.btn.post.click(function ()
-		{
-		    ui.btn.post.hide();
-		    ui.btn.del.hide();
-		    ui.btn.cancel.hide();
-		    ui.btn.stop.show();
-		    if (!_this.IsPostQueueFull())
-		    {
-		        upFile.post();
-		    }
-		    else
-		    {
-		        upFile.Ready();
-		        //添加到队列
-                _this.AppendQueue(fileLoc.id);
-		    }
-		});
-		ui.btn.stop.click(function ()
-		{
-		    upFile.stop();
-		});
-		ui.btn.del.click(function () { upFile.remove(); });
 		
 		upFile.Ready(); //准备
 		return upFile;

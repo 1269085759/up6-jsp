@@ -1,9 +1,11 @@
-<%@ page language="java" import="up6.*" pageEncoding="UTF-8"%><%@
-	page contentType="text/html;charset=UTF-8"%><%@
-	page import="up6.biz.*" %><%@
-	page import="up6.DBConfig" %><%@
-	page import="org.apache.commons.lang.StringUtils" %><%@
-	page import="java.net.URLEncoder" %><%
+<%@ page language="java" import="up6.*" pageEncoding="UTF-8"%>
+<%@ page contentType="text/html;charset=UTF-8"%>
+<%@ page import="up6.biz.*" %>
+<%@ page import="up6.DBConfig" %>
+<%@ page import="org.apache.commons.lang.StringUtils" %>
+<%@ page import="java.net.URLEncoder" %>
+<%
+out.clear();
 /*
 	获取所有未上传完的文件和文件夹
 	更新记录：

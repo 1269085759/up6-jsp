@@ -30,6 +30,7 @@ public class SqlWhereMerge {
 	}
 	
 	public void clear() {this.m_cds.clear();}
+	public void del(String n) { this.m_cds.remove(n); }
 	
 	public String to_sql()
     {

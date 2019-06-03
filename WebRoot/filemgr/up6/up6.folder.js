@@ -69,6 +69,13 @@ function FolderUploader(fdLoc, mgr)
         });
         this.ui.btn.post.show();
     };
+    this.svr_err_same_name = function ()
+    {
+        this.manager.RemoveQueuePost(this.fileSvr.id);
+        this.ui.msg.text("服务器存在同名目录");
+        this.ui.btn.stop.hide();
+        this.ui.btn.cancel.show();
+    };
     this.svr_remove = function ()
     {
         var param = { uid: this.fields["uid"], id: this.id, time: new Date().getTime() };
@@ -311,7 +318,8 @@ function FolderUploader(fdLoc, mgr)
         }
         //在此处增加服务器验证代码。
         this.ui.msg.text("初始化...");
-        var param = jQuery.extend({}, this.fields, {
+        $.extend(this.fileSvr, this.Config.bizData);
+        var param = jQuery.extend({}, this.fields,this.Config.bizData, {
             id: this.fileSvr.id,
             lenLoc: this.fileSvr.lenLoc,
             sizeLoc: this.fileSvr.sizeLoc,
@@ -327,6 +335,12 @@ function FolderUploader(fdLoc, mgr)
             , data: param
 			, success: function (msg)
 			{
+                //存在同名目录
+                if (!msg.ret) {
+                    _this.svr_err_same_name();
+                    return;
+                }
+                
 				try
 				{
 					var json = JSON.parse(decodeURIComponent(msg.value));
@@ -406,7 +420,7 @@ function FolderUploader(fdLoc, mgr)
         this.manager.del_file(this.fileSvr.id);
         this.app.delFolder({ id: this.id });
         this.manager.Delete(this.id);
-        this.svr_remove();
+        if (this.State != this.Config.state.Complete) this.svr_remove();
         this.ui.div.remove();
     };
 }

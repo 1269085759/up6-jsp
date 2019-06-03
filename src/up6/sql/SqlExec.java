@@ -1,6 +1,5 @@
 package up6.sql;
 
-import java.awt.List;
 import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -12,14 +11,11 @@ import org.apache.commons.lang.StringUtils;
 
 import com.jayway.jsonpath.JsonPath;
 import com.jayway.jsonpath.ReadContext;
-import com.jayway.jsonpath.internal.filter.ValueNode.JsonNode;
-
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import up6.ConfigReader;
 import up6.DBConfig;
 import up6.DbHelper;
-import up6.XDebug;
 
 public class SqlExec {
 	ReadContext m_table;
@@ -54,7 +50,6 @@ public class SqlExec {
     	this.m_table = this.table(table);
     	JSONArray field_sel = this.selFields(fields);
     	String[] names = fields.split(",");
-    	XDebug.Output(newNames);
     	if( !StringUtils.isBlank(newNames) ) names = newNames.split(",");
    	
     	JSONArray arr = new JSONArray();
@@ -96,8 +91,8 @@ public class SqlExec {
 			for(int i = 0 ; i < values.size(); ++i)
 			{
 				JSONObject val = (JSONObject)values.get(i);
-				this.m_svs.set(cmd, field_sel, val);
-				this.m_svs.set(cmd, field_where, val);
+				int parIndex = this.m_svs.set(cmd, field_sel, val,0);
+				this.m_svs.set(cmd, field_where, val,parIndex );
 				cmd.execute();
 			}
 			con.close();
@@ -146,12 +141,13 @@ public class SqlExec {
      */
     public JSONArray selFields(SqlParam[] ps)
     {
+    	if(null == ps ) return null;
+    	if(ps.length < 1) return null;
     	JSONArray arr = new JSONArray();
     	
     	for(SqlParam p : ps)
     	{
     		String q = String.format("$.fields[?(@.name=='%s')]",p.m_name);
-    		XDebug.Output(q);
     		net.minidev.json.JSONArray o = this.m_table.read(q);    		 
     		
     		arr.add( o.get(0) );
@@ -278,17 +274,18 @@ public class SqlExec {
     {
     	this.m_table = this.table(table);
     	JSONArray field_sel = this.selFields(fields);
-    	JSONArray field_condition = this.selFields(ps);
+    	JSONArray field_cdt = this.selFields(ps);
     	String sql = String.format("select %s from %s where %s", fields,table,this.toSqlConditions(ps));
 
     	DbHelper db = new DbHelper();
     	PreparedStatement cmd = db.GetCommand(sql);
-    	this.m_svs.set(cmd, field_condition, ps);
+    	this.m_svs.set(cmd, field_cdt, ps);
     	ResultSet r = db.ExecuteDataSet(cmd);
-    	JSONObject o = new JSONObject();    	
+    	JSONObject o = null;    	
     	try {
 			if(r.next())
 			{
+				o = new JSONObject();
 		    	SqlCmdReader scr = new SqlCmdReader();
 		    	o = scr.read(r, field_sel);
 			}
@@ -305,7 +302,7 @@ public class SqlExec {
     public void insert(String table,String fields,JSONObject o)
     {
     	this.m_table = this.table(table);
-    	JSONArray field_sel = this.selFields(fields);        
+    	JSONArray field_sel = this.selFields(fields);
 
         String sql = String.format("insert into %s ( %s ) values( %s );"
             , table
@@ -343,8 +340,8 @@ public class SqlExec {
     	
     	DbHelper db = new DbHelper();
     	PreparedStatement cmd = db.GetCommand(sql);
-    	this.m_svs.set(cmd, field_sel,obj);
-    	this.m_svs.set(cmd, field_were,obj);
+    	int prevIndex = this.m_svs.set(cmd, field_sel,obj,0);
+    	this.m_svs.set(cmd, field_were,obj,prevIndex);
     	db.ExecuteNonQuery(cmd);
     }
     
@@ -371,8 +368,8 @@ public class SqlExec {
     	    	
     	DbHelper db = new DbHelper();
     	PreparedStatement cmd = db.GetCommand(sql);
-    	this.m_svs.set(cmd, field_sel, fields);
-    	this.m_svs.set(cmd, field_where, where);
+    	int prevIndex = this.m_svs.set(cmd, field_sel, fields,0);
+    	this.m_svs.set(cmd, field_where, where,prevIndex);
     	db.ExecuteNonQuery(cmd);
     }
     
@@ -420,22 +417,51 @@ public class SqlExec {
     	SqlCmdReader scr = new SqlCmdReader();
     	this.m_table = this.table(table);
     	JSONArray field_sel = this.selFields(fields);
-    	JSONArray field_where = this.selFields(where);
+    	JSONArray field_cdt = this.selFields(where);
     	
-    	String sql = String.format("select %s from %s where %s", fields,table,this.toSqlConditions(where));
-    	if( null == where )
-    	{
-    		sql = String.format("select %s from %s", fields,table);
-    	}
+    	String sql_where = "";
+    	if(where.length>0) sql_where = String.format("where %s", this.toSqlConditions(where));    	
     	
-    	if(!StringUtils.isBlank( sort) )
-    	{
-    		sql = String.format("select %s from %s where %s order by %s", fields,table,this.toSqlConditions(where),sort);
-    	}
+    	String sql_sort="";
+    	if(!StringUtils.isBlank(sort)) sql_sort = String.format("order by %s", sort);
     	
+    	String sql = String.format("select %s from %s %s %s", fields,table,sql_where,sql_sort);    	
+    	    	
     	DbHelper db = new DbHelper();
     	PreparedStatement cmd = db.GetCommand(sql);
-    	this.m_svs.set(cmd, field_where, where);//设置条件参数
+    	this.m_svs.set(cmd, field_cdt, where);//设置条件参数
+    	ResultSet r = db.ExecuteDataSet(cmd);
+    	JSONArray arr = new JSONArray();
+    	
+    	try {
+			while(r.next())
+			{
+				JSONObject o = scr.read(r, field_sel);
+				arr.add(o);
+			}
+			r.close();
+			cmd.getConnection().close();
+			cmd.close();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+    	return arr;
+    }
+    
+    public JSONArray select(String table,String fields,String where,String sort)
+    {
+    	SqlCmdReader scr = new SqlCmdReader();
+    	this.m_table = this.table(table);
+    	JSONArray field_sel = this.selFields(fields);
+    	
+    	if( !StringUtils.isBlank(where) ) where = String.format("where %s", where);
+    	if( !StringUtils.isBlank(sort)) sort = String.format(" order by %s", sort);
+    	
+    	String sql = String.format("select %s from %s %s %s", fields,table,where,sort);  	
+    	
+    	DbHelper db = new DbHelper();
+    	PreparedStatement cmd = db.GetCommand(sql);    	
     	ResultSet r = db.ExecuteDataSet(cmd);
     	JSONArray arr = new JSONArray();
     	

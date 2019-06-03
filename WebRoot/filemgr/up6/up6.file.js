@@ -40,19 +40,57 @@ function FileUploader(fileLoc, mgr)
     {
         this.ui.msg.text("正在上传队列中等待...");
         this.State = this.Config.state.Ready;
+        this.ui.btn.post.click(function () {
+            _this.ui.btn.post.hide();
+            _this.ui.btn.del.hide();
+            _this.ui.btn.cancel.hide();
+            _this.ui.btn.stop.show();
+            if (!_this.Manager.IsPostQueueFull()) {
+                _this.post();
+            }
+            else {
+                _this.Ready();
+                //添加到队列
+                _this.Manager.AppendQueue(_this.fileSvr.id);
+            }
+        });
+        this.ui.btn.stop.click(function () {
+            _this.stop();
+        });
+        this.ui.btn.del.click(function () {
+            _this.stop();
+            _this.remove();
+        });
+        this.ui.btn.cancel.click(function () {
+            _this.stop();
+            _this.remove();
+            //_this.PostFirst();//
+        });
     };
 
     this.svr_error = function ()
     {
         alert("服务器返回信息为空，请检查服务器配置");
         this.ui.msg.text("向服务器发送MD5信息错误");
-        this.ui.btn.cancel.text("续传");
+        //this.ui.btn.cancel.text("续传");
+        this.ui.btn.stop.hide();
+        this.ui.btn.cancel.show();
+    };
+    this.svr_error_same_name = function () {        
+        this.ui.msg.text("服务器存在同名文件");
+        this.ui.btn.stop.hide();
+        this.ui.btn.cancel.show();
     };
     this.svr_create = function (sv)
     {
         if (sv.value == null)
         {
+            this.Manager.RemoveQueuePost(this.fileSvr.id);
             this.svr_error(); return;
+        }
+        if (!sv.ret) {
+            this.Manager.RemoveQueuePost(this.fileSvr.id);
+            this.svr_error_same_name(); return;
         }
 
         var str = decodeURIComponent(sv.value);//
@@ -80,6 +118,20 @@ function FileUploader(fileLoc, mgr)
             , data: param
             , success: function (msg) {}
             , error: function (req, txt, err) { alert("更新文件进度错误！" + req.responseText); }
+            , complete: function (req, sta) { req = null; }
+        });
+    };
+    this.svr_remove = function ()
+    {
+        var param = { uid: this.fields["uid"], id: this.fileSvr.id, time: new Date().getTime() };
+        $.ajax({
+            type: "GET"
+            , dataType: 'jsonp'
+            , jsonp: "callback" //自定义的jsonp回调函数名称，默认为jQuery自动生成的随机函数名
+            , url: this.Config["UrlDel"]
+            , data: param
+            , success: function (msg) { }
+            , error: function (req, txt, err) { alert("删除文件失败！" + req.responseText); }
             , complete: function (req, sta) { req = null; }
         });
     };
@@ -195,7 +247,7 @@ function FileUploader(fileLoc, mgr)
         var loc_path = encodeURIComponent(this.fileSvr.pathLoc);
         var loc_len = this.fileSvr.lenLoc;
         var loc_size = this.fileSvr.sizeLoc;
-        var param = jQuery.extend({}, this.fields, { md5: json.md5, id: this.fileSvr.id, lenLoc: loc_len, sizeLoc: loc_size, pathLoc: loc_path, time: new Date().getTime() });
+        var param = jQuery.extend({}, this.fields, this.Config.bizData, { md5: json.md5, id: this.fileSvr.id, lenLoc: loc_len, sizeLoc: loc_size, pathLoc: loc_path, time: new Date().getTime() });
 
         $.ajax({
             type: "GET"
@@ -209,9 +261,11 @@ function FileUploader(fileLoc, mgr)
             }
             , error: function (req, txt, err)
             {
+                _this.Manager.RemoveQueuePost(_this.fileSvr.id);
                 alert("向服务器发送MD5信息错误！" + req.responseText);
                 _this.ui.msg.text("向服务器发送MD5信息错误");
-                _this.ui.btn.del.text("续传");
+                _this.ui.btn.cancel.show();
+                _this.ui.btn.stop.hide();
             }
             , complete: function (req, sta) { req = null; }
         });
@@ -302,5 +356,6 @@ function FileUploader(fileLoc, mgr)
         this.Manager.del_file(this.fileSvr.id);
         this.app.delFile(this.fileSvr);
         this.ui.div.remove();
+        if (this.State != this.Config.state.Complete) this.svr_remove();
     };
 }

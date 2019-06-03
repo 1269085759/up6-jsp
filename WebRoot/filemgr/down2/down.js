@@ -313,13 +313,13 @@ function DownloaderMgr()
 	    return v;
 	};
     this.remove_url = function (url) {
-        this.filesUrl = $.grep(this.filesUrl, function (n, i) {
+        $.grep(this.filesUrl, function (n, i) {
             return n == url;
         },true);
     };
     this.remove_wait = function (id) {
         if (this.queueWait.length == 0) return;
-        this.queueWait = $.grep(this.queueWait, function (n, i){
+        $.grep(this.queueWait, function (n, i){
             return n == id;
         }, true);
     };
@@ -334,7 +334,7 @@ function DownloaderMgr()
     this.add_work = function (id) { this.queueWork.push(id); };
     this.del_work = function (id) {
         if (_this.queueWork.length < 1) return;
-        this.queueWork = $.grep(this.queueWork, function (n, i){
+        $.grep(this.queueWork, function (n, i){
             return n = id;
         }, true);
     };
@@ -521,7 +521,13 @@ function DownloaderMgr()
                 _this.stop_queue();
             }
         });
-	};
+    };
+    this.page_close = function () {
+        if (this.edge) _this.edgeApp.close();
+        if (_this.queueWork.length > 0) {
+            _this.stop_queue();
+        }
+    };
 	
 	this.loadAuto = function()
 	{

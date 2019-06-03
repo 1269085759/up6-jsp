@@ -97,15 +97,15 @@ public class fd_scan
 	{
 		StringBuilder sb = new StringBuilder();
 		sb.append("insert into up6_folders (");
-		sb.append(" fd_id");//1
-		sb.append(",fd_pid");//2
-		sb.append(",fd_pidRoot");//3
-		sb.append(",fd_name");//4
-		sb.append(",fd_uid");//5
-		sb.append(",fd_pathLoc");//6
-		sb.append(",fd_pathSvr");//7
-		sb.append(",fd_pathRel");//8
-		sb.append(",fd_complete");//9
+		sb.append(" f_id");//1
+		sb.append(",f_pid");//2
+		sb.append(",f_pidRoot");//3
+		sb.append(",f_nameLoc");//4
+		sb.append(",f_uid");//5
+		sb.append(",f_pathLoc");//6
+		sb.append(",f_pathSvr");//7
+		sb.append(",f_pathRel");//8
+		sb.append(",f_complete");//9
 		sb.append(") values(");//
 		sb.append(" ?");
 		sb.append(",?");

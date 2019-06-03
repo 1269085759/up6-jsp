@@ -68,7 +68,10 @@ function DownloaderMgr()
             , "7": "本地目录不存在"
             , "8": "查询文件信息失败"
             , "9": "子文件大小超过限制"
-            , "10": "子文件数量超过限制"}
+            , "10": "子文件数量超过限制"
+        	, "11": "连接服务器失败"
+            , "12": "地址错误"
+            , "13": "服务器错误"}
         , state: {
             Ready: 0,
             Posting: 1,
@@ -328,13 +331,13 @@ function DownloaderMgr()
 	    return v;
 	};
     this.remove_url = function (url) {
-        this.filesUrl = $.grep(this.filesUrl, function (n, i) {
+        $.grep(this.filesUrl, function (n, i) {
             return n == url;
         },true);
     };
     this.remove_wait = function (id) {
         if (this.queueWait.length == 0) return;
-        this.queueWait = $.grep(this.queueWait, function (n, i){
+        $.grep(this.queueWait, function (n, i){
             return n == id;
         }, true);
     };
@@ -349,7 +352,7 @@ function DownloaderMgr()
     this.add_work = function (id) { this.queueWork.push(id); };
     this.del_work = function (id) {
         if (_this.queueWork.length < 1) return;
-        this.queueWork = $.grep(this.queueWork, function (n, i){
+        $.grep(this.queueWork, function (n, i){
             return n = id;
         }, true);
     };
