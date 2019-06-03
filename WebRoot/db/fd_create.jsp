@@ -11,33 +11,6 @@
 <%
 out.clear();
 /*
-	以md5模式上传文件夹，不在服务端创建层级结构，在数据库中保存层级信息。
-	客户端上传的文件夹JSON格式：
-    [
-	     [name:"soft"		    //文件夹名称
-	     ,pid:0                //父级ID
-	     ,idLoc:0              //文件夹ID，客户端定义
-	     ,idSvr:0              //文件夹ID，与数据库中的xdb_folder.fd_id对应。
-	     ,length:"102032"      //数字化的文件夹大小，以字节为单位
-	     ,size:"10G"           //格式化的文件夹大小
-	     ,pathLoc:"d:\\soft"   //文件夹在客户端的路径
-	     ,pathSvr:"e:\\web"    //文件夹在服务端的路径
-	     ,foldersCount:0       //子文件夹总数
-	     ,filesCount:0         //子文件总数
-	     ,filesComplete:0      //已上传完成的子文件总数
-	     ,folders:[
-	           {name:"img1",pidLoc:0,pidSvr:10,idLoc:1,idSvr:0,pathLoc:"D:\\Soft\\img1",pathSvr:"E:\\Web"}
-	          ,{name:"img2",pidLoc:1,pidSvr:10,idLoc:2,idSvr:0,pathLoc:"D:\\Soft\\image2",pathSvr:"E:\\Web"}
-	          ,{name:"img3",pidLoc:2,pidSvr:10,idLoc:3,idSvr:0,pathLoc:"D:\\Soft\\image2\\img3",pathSvr:"E:\\Web"}
-	          ]
-	     ,files:[
-	           {name:"f1.exe",idLoc:0,idSvr:0,pidRoot:0,pidLoc:1,pidSvr:0,length:"100",size:"100KB",pathLoc:"",pathSvr:""}
-	          ,{name:"f2.exe",idLoc:0,idSvr:0,pidRoot:0,pidLoc:1,pidSvr:0,length:"100",size:"100KB",pathLoc:"",pathSvr:""}
-	          ,{name:"f3.exe",idLoc:0,idSvr:0,pidRoot:0,pidLoc:1,pidSvr:0,length:"100",size:"100KB",pathLoc:"",pathSvr:""}
-	          ,{name:"f4.rar",idLoc:0,idSvr:0,pidRoot:0,pidLoc:1,pidSvr:0,length:"100",size:"100KB",pathLoc:"",pathSvr:""}
-	          ]
-	]
-
 	更新记录：
 		2014-07-23 创建
 		2014-08-05 修复BUG，上传文件夹如果没有子文件夹时报错的问题。
@@ -52,9 +25,6 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 
 WebBase web     = new WebBase(pageContext);
 String id       = web.queryString("id");
-String pid      = web.queryString("pid");
-String pidRoot  = web.queryString("pidRoot");
-if( StringUtils.isBlank(pidRoot)) pidRoot = pid;//父目录是根目录
 String uid      = web.queryString("uid");
 String lenLoc   = web.queryString("lenLoc");
 String sizeLoc  = web.queryString("sizeLoc");
@@ -74,8 +44,6 @@ if (StringUtils.isBlank(id)
 
 FileInf fileSvr = new FileInf();
 fileSvr.id      = id;
-fileSvr.pid     = pid;
-fileSvr.pidRoot = pidRoot;
 fileSvr.fdChild = false;
 fileSvr.fdTask  = true;
 fileSvr.uid     = Integer.parseInt(uid);
@@ -86,19 +54,6 @@ fileSvr.sizeLoc = sizeLoc;
 fileSvr.deleted = false;
 fileSvr.nameSvr = fileSvr.nameLoc;
 
-//检查同名目录
-DbFolder df = new DbFolder();
-if (df.exist_same_folder(fileSvr.nameLoc, pid))
-{
-	JSONObject o = new JSONObject();
-	o.put("value","");
-	o.put("ret", false);
-	o.put("code", "102");    
-    String js = callback + String.format("(%s)", o.toString());
-    web.toContent(js);
-    return;
-}
-
 //生成存储路径
 PathBuilderUuid pb = new PathBuilderUuid();
 fileSvr.pathSvr = pb.genFolder(fileSvr);
@@ -108,8 +63,7 @@ PathTool.createDirectory(fileSvr.pathSvr);
 //添加到数据表
 DBConfig cfg = new DBConfig();
 DBFile db = cfg.db();
-if(StringUtils.isBlank(pid)) db.Add(fileSvr);
-else db.addFolderChild(fileSvr);
+db.Add(fileSvr);
 up6_biz_event.folder_create(fileSvr);
 
 Gson g = new Gson();
@@ -119,6 +73,5 @@ json = json.replace("+","%20");
 
 JSONObject ret = new JSONObject();
 ret.put("value",json);
-ret.put("ret",true);
 json = callback + String.format("(%s)",ret.toString());//返回jsonp格式数据。
 out.write(json);%>
