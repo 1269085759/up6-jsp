@@ -313,13 +313,13 @@ function DownloaderMgr()
 	    return v;
 	};
     this.remove_url = function (url) {
-        $.grep(this.filesUrl, function (n, i) {
+        this.filesUrl = $.grep(this.filesUrl, function (n, i) {
             return n == url;
         },true);
     };
     this.remove_wait = function (id) {
         if (this.queueWait.length == 0) return;
-        $.grep(this.queueWait, function (n, i){
+        this.queueWait = $.grep(this.queueWait, function (n, i){
             return n == id;
         }, true);
     };
@@ -334,7 +334,7 @@ function DownloaderMgr()
     this.add_work = function (id) { this.queueWork.push(id); };
     this.del_work = function (id) {
         if (_this.queueWork.length < 1) return;
-        $.grep(this.queueWork, function (n, i){
+        this.queueWork = $.grep(this.queueWork, function (n, i){
             return n = id;
         }, true);
     };
