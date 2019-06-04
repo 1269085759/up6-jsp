@@ -18,7 +18,7 @@ public class SqlCmdReader {
 		type = type.toLowerCase();
 		
 		try {			
-			     if(StringUtils.equals("string", type)) o = r.getString(index);
+			     if(StringUtils.equals("string", type)) o = r.getString(index)==null ? "" : r.getString(index);
 			else if(StringUtils.equals("int", type)) o = r.getInt(index);
 			else if(StringUtils.equals("datetime", type)) o = r.getDate(index).toString();
 			else if(StringUtils.equals("long", type)) o = r.getLong(index);
@@ -42,7 +42,7 @@ public class SqlCmdReader {
 		String type = field.getString("type").toLowerCase();
 		
 		try {			
-			     if(StringUtils.equals("string", type)) o = r.getString(index);
+			     if(StringUtils.equals("string", type)) o = r.getString(index)==null ? "" : r.getString(index);
 			else if(StringUtils.equals("int", type)) o = r.getInt(index);
 			else if(StringUtils.equals("datetime", type)) o = r.getDate(index).toString();
 			else if(StringUtils.equals("long", type)) o = r.getLong(index);

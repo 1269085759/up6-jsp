@@ -571,30 +571,24 @@ public class SqlExec {
     	
     	JSONArray arr = new JSONArray();
     	try {
+    		int pageStart = (pageIndex - 1)*(pageSize - 1);
+    		int pageEnd = (pageIndex - 1) * pageSize + pageSize;
+    		String sql = String.format("select * from (select rownum rn ,a.* from(select %s from %s where %s) a where rownum <= %d ) where rn >= %d",fields,table,where,pageEnd,pageStart);
 
         	DbHelper db = new DbHelper();
-        	CallableStatement cmd = db.GetCommandStored("{call sppage_cursor(?,?,?,?,?,?,?,?)}");
-			cmd.setString(1, table);
-            cmd.setString(2, primaryKey);
-            cmd.setInt(3, pageSize);
-            cmd.setInt(4, pageIndex);            
-            cmd.setString(5, where);
-            cmd.setString(6, fields);
-            cmd.setString(7, sort);
-            cmd.registerOutParameter(8, oracle.jdbc.OracleTypes.CURSOR);
-            cmd.execute();
-            ResultSet r = (ResultSet)cmd.getObject(8);
+        	PreparedStatement cmd = db.GetCommand(sql);            
+            ResultSet r = db.ExecuteDataSet(cmd);
             while(r.next())
             {
             	JSONObject item = new JSONObject();
             	for(int i = 0 ; i < field_sel.size();++i)
             	{
-            		JSONObject column = (JSONObject) field_sel.get(i);
+            		JSONObject column = field_sel.getJSONObject(i);
             		Object v = this.m_scr.read(r, column.getString("type"), i+2);//第一列是行号
             		item.put(column.getString("name"),v);
             	}
-        		arr.add(item);            	
-            }
+        		arr.add(item);
+            }            
             r.close();
             cmd.getConnection().close();
             cmd.close();

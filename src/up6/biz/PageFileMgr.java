@@ -357,7 +357,7 @@ public class PageFileMgr {
 		if(StringUtils.isBlank(pageIndex)) pageIndex = "1";
 		
 		SqlWhereMerge swm = new SqlWhereMerge();
-		swm.equal("f_pid", pid);
+		if( !StringUtils.isBlank(pid)) swm.equal("f_pid", pid);
 		swm.equal("f_complete", 1);
 		swm.equal("f_deleted", 0);
 		swm.equal("f_fdChild", 1);
