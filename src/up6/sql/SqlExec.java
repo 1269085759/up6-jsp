@@ -304,7 +304,7 @@ public class SqlExec {
     	this.m_table = this.table(table);
     	JSONArray field_sel = this.selFields(fields);
 
-        String sql = String.format("insert into %s ( %s ) values( %s );"
+        String sql = String.format("insert into %s ( %s ) values( %s )"
             , table
             , fields
             , this.toParam(fields));
@@ -320,7 +320,7 @@ public class SqlExec {
         JSONArray field_sel = this.selFields(pars);
         
 
-        String sql = String.format("insert into %s ( %s ) values( %s );"
+        String sql = String.format("insert into %s ( %s ) values( %s )"
             , table
             , this.toFields(pars)
             , this.toParam(pars));
