@@ -119,10 +119,7 @@ function FolderUploader(fdLoc, mgr)
     //上传，创建文件夹结构信息
     this.post = function ()
     {
-        this.ui.btn.stop.show();
-        this.ui.btn.del.hide();
-        this.ui.btn.post.hide();
-        this.ui.btn.cancel.hide();
+        $.each(this.ui.btn, function (i, n) { n.hide();});
         this.manager.AppendQueuePost(this.id);//添加到队列中
         this.State = this.Config.state.Posting;
         //如果文件夹已初始化，表示续传。
@@ -193,8 +190,6 @@ function FolderUploader(fdLoc, mgr)
     };
     this.post_fd = function ()
     {
-        this.ui.btn.stop.show();
-        this.ui.btn.post.hide();
         this.State = this.Config.state.Posting;
         var fd = jQuery.extend({}, { id: this.id, pathLoc: this.fileSvr.pathLoc, fields: this.fields });
         this.app.postFolder(fd);
@@ -245,6 +240,7 @@ function FolderUploader(fdLoc, mgr)
     };
     this.post_process = function (json)
     {
+        this.ui.btn.stop.show();
         this.fileSvr.lenSvr = json.lenSvr;
         this.fileSvr.perSvr = json.percent;
         this.ui.percent.text("(" + json.percent+")");

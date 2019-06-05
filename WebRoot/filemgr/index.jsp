@@ -63,6 +63,7 @@ PageFileMgr pfm = new PageFileMgr(pageContext);
 		        	//JavaScript代码区域
 		            layui.use(['element', 'table','laytpl'], function () {
 		                var element = layui.element, table = layui.table,laytpl = layui.laytpl;
+		                pageApp.attr.ui.table = table;
 		
 		                //js-module
 		                table.render({
@@ -95,7 +96,7 @@ PageFileMgr pfm = new PageFileMgr(pageContext);
 		                        	return str;
 		                        	} }
 		                    ]],
-		                    done: function (res, curr, count) { pageApp.attr.ui.table = table;}
+		                    done: function (res, curr, count) { }
 		                });
 		
 		                table.on('tool(files)', function (obj) { pageApp.attr.event.table_tool_click(obj, table);});
