@@ -151,6 +151,7 @@ public class DbFolder
 	{
         SqlWhereMerge swm = new SqlWhereMerge();
         swm.equal("f_nameLoc", name.trim());
+        swm.equal("f_deleted", 0);
         swm.equal("LTRIM (f_pid)", pid.trim());
         String where = swm.to_sql();
 

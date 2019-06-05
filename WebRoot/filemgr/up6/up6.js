@@ -817,34 +817,6 @@ function HttpUploaderMgr()
 		var fdTask = new FolderUploader( fdLoc, this);
 		this.filesMap[fdLoc.id] = fdTask;//添加到映射表
 		fdTask.ui = ui;
-	    ui.btn.cancel.click(function()
-		{
-			fdTask.stop();
-			fdTask.remove();
-							
-	    });
-	    ui.btn.post.click(function ()
-	    {
-	        ui.btn.post.hide();
-	        ui.btn.del.hide();
-	        ui.btn.cancel.hide();
-	        ui.btn.stop.show();
-
-	        if (!_this.IsPostQueueFull())
-	        {
-	            fdTask.post();
-	        }
-	        else
-	        {
-	            fdTask.Ready();
-	            _this.AppendQueue(fdTask.id);
-	        }
-	    });
-	    ui.btn.stop.click(function ()
-	    {
-	        fdTask.stop();
-	    });
-		ui.btn.del.click(function(){fdTask.remove();});
 		fdTask.Ready(); //准备
 		return fdTask;
 	};

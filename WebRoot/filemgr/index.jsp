@@ -86,10 +86,12 @@ PageFileMgr pfm = new PageFileMgr(pageContext);
                                         return str;
 		                            }
 		                        }
-		                        , { field: 'f_sizeLoc', title: '大小', width: 80, sort: false, }
+		                        , {
+                                    field: 'f_sizeLoc', title: '大小', width: 80, sort: false, templet: function (d) { if (d.f_fdTask) return ""; else return d.f_sizeLoc;}
+                                }
 		                        , { field: 'f_time', title: '上传时间', width:150, templet: function (d) { return moment(d.f_time).format('YYYY-MM-DD HH:mm:ss') } }
 		                        , { title: '编辑', templet: function (d) { 
-		                        	var str =  laytpl('<a class="layui-table-link link m-r-md" lay-event="rename"><img src="{{d.edit}}"/>重命名</a><a class="layui-table-link link" lay-event="delete"><img src="{{d.del}}"/>删除</a>').render({edit:page.path.res+'imgs/16/edit.png',del:page.path.res+"imgs/16/del.png"});
+		                        	var str =  laytpl('<a class="layui-table-link link m-r-md" lay-event="rename"><img src="{{d.edit}}"/>重命名</a><a class="layui-table-link link m-r-md" lay-event="down"><img src="{{d.down}}"/>下载</a><a class="layui-table-link link" lay-event="delete"><img src="{{d.del}}"/>删除</a>').render({edit:page.path.res+'imgs/16/edit.png',del:page.path.res+"imgs/16/del.png",down:page.path.res+"imgs/16/down.png"});
 		                        	return str;
 		                        	} }
 		                    ]],

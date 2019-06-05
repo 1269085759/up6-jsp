@@ -27,6 +27,32 @@ function FolderUploader(fdLoc, mgr)
     {
         this.ui.msg.text("正在上传队列中等待...");
         this.State = this.Config.state.Ready;
+        this.ui.btn.cancel.click(function () {
+            _this.stop();
+            _this.remove();
+
+        });
+        this.ui.btn.post.click(function () {
+            _this.ui.btn.post.hide();
+            _this.ui.btn.del.hide();
+            _this.ui.btn.cancel.hide();
+            _this.ui.btn.stop.show();
+
+            if (!_this.manager.IsPostQueueFull()) {
+                _this.post();
+            }
+            else {
+                _this.ui.msg.text("正在上传队列中等待...");
+                _this.State = _this.Config.state.Ready;
+                $.each(_this.ui.btn, function (i, n) { n.hide(); });
+                _this.ui.btn.del.show();
+                _this.manager.AppendQueue(_this.fileSvr.id);
+            }
+        });
+        this.ui.btn.stop.click(function () {
+            _this.stop();
+        });
+        this.ui.btn.del.click(function () { _this.remove(); });
     };
     this.svr_create = function (fdSvr)
     {

@@ -482,9 +482,9 @@ public class PageFileMgr {
 
         SqlExec se = new SqlExec();
         JSONArray files = se.exec("up6_files"
-            , "select f_id,f_nameLoc,f_pathLoc ,f_sizeLoc,f_lenSvr,f_perSvr,f_fdTask from up6_files where f_complete=0 and f_fdChild=0 and f_deleted=0"
-            , "f_id,f_nameLoc,f_pathLoc,f_sizeLoc,f_lenSvr,f_perSvr,f_fdTask"
-            , "id,nameLoc,pathLoc,sizeLoc,lenSvr,perSvr,fdTask");
+            , "select f_id,f_nameLoc,f_pathLoc ,f_sizeLoc,f_lenSvr,f_perSvr,f_fdTask,f_md5 from up6_files where f_complete=0 and f_fdChild=0 and f_deleted=0"
+            , "f_id,f_nameLoc,f_pathLoc,f_sizeLoc,f_lenSvr,f_perSvr,f_fdTask,f_md5"
+            , "id,nameLoc,pathLoc,sizeLoc,lenSvr,perSvr,fdTask,md5");
         this.m_wb.toContent( files );
 	}
 	public void uncmp_down() {
