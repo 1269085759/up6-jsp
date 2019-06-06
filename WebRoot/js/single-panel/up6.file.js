@@ -40,6 +40,35 @@ function FileUploader(fileLoc, mgr)
     {
         this.ui.msg.text("正在上传队列中等待...");
         this.State = this.Config.state.Ready;
+        this.ui.btn.post.click(function () {
+            _this.ui.btn.post.hide();
+            _this.ui.btn.del.hide();
+            _this.ui.btn.cancel.hide();
+            _this.ui.btn.stop.show();
+            if (!_this.Manager.IsPostQueueFull()) {
+                _this.post();
+            }
+            else {
+                _this.ui.msg.text("正在上传队列中等待...");
+                _this.State = _this.Config.state.Ready;
+                $.each(_this.ui.btn, function (i, n) { n.hide(); });
+                _this.ui.btn.del.show();
+                //添加到队列
+                _this.Manager.AppendQueue(_this.fileSvr.id);
+            }
+        });
+        this.ui.btn.stop.click(function () {
+            _this.stop();
+        });
+        this.ui.btn.del.click(function () {
+            _this.stop();
+            _this.remove();
+        });
+        this.ui.btn.cancel.click(function () {
+            _this.stop();
+            _this.remove();
+            //_this.PostFirst();//
+        });
     };
 
     this.svr_error = function ()
@@ -258,7 +287,7 @@ function FileUploader(fileLoc, mgr)
     };
     this.post_file = function ()
     {
-        this.ui.btn.cancel.hide();
+        $.each(this.ui.btn, function (i, n) { n.hide();});
         this.ui.btn.stop.show();
         this.State = this.Config.state.Posting;//
         this.app.postFile({ id: this.fileSvr.id, pathLoc: this.fileSvr.pathLoc, pathSvr: this.fileSvr.pathSvr, lenSvr: this.fileSvr.lenSvr, fields: this.fields });
@@ -273,10 +302,7 @@ function FileUploader(fileLoc, mgr)
     };
     this.stop = function ()
     {
-        this.ui.btn.del.hide();
-        this.ui.btn.cancel.hide();
-        this.ui.btn.stop.hide();
-        this.ui.btn.post.hide();
+        $.each(this.ui.btn, function (i, n) { n.hide();});
         this.svr_update();
         this.app.stopFile({ id: this.fileSvr.id });        
     };

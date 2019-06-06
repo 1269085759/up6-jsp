@@ -1043,34 +1043,6 @@ function HttpUploaderMgr()
 		uiSize.text(fileLoc.sizeLoc);
 		uiMsg.text("");
 		uiPercent.text("(0%)");
-		btnCancel.click(function()
-		{
-			upFile.stop();
-			upFile.remove();
-			_this.PostFirst();//
-		});
-		btnPost.click(function ()
-		{
-		    btnPost.hide();
-		    btnDel.hide();
-		    btnCancel.hide();
-		    btnStop.show();
-		    if (!_this.IsPostQueueFull())
-		    {
-		        upFile.post();
-		    }
-		    else
-		    {
-		        upFile.Ready();
-		        //添加到队列
-                _this.AppendQueue(fileLoc.id);
-		    }
-		});
-		btnStop.click(function ()
-		{
-		    upFile.stop();
-		});
-		btnDel.click(function () { upFile.remove(); });
 		
 		upFile.Ready(); //准备
 		return upFile;
@@ -1123,34 +1095,6 @@ function HttpUploaderMgr()
 		var fdTask = new FolderUploader( fdLoc, this);
 		this.filesMap[fdLoc.id] = fdTask;//添加到映射表
 		fdTask.ui = ui_eles;
-	    btnCancel.click(function()
-		{
-			fdTask.stop();
-			fdTask.remove();
-							
-	    });
-	    btnPost.click(function ()
-	    {
-	        btnPost.hide();
-	        btnDel.hide();
-	        btnCancel.hide();
-	        btnStop.show();
-
-	        if (!_this.IsPostQueueFull())
-	        {
-	            fdTask.post();
-	        }
-	        else
-	        {
-	            fdTask.Ready();
-	            _this.AppendQueue(fdTask.id);
-	        }
-	    });
-	    btnStop.click(function ()
-	    {
-	        fdTask.stop();
-	    });
-		btnDel.click(function(){fdTask.remove();});
 		fdTask.Ready(); //准备
 		return fdTask;
 	};

@@ -29,6 +29,32 @@ function FolderUploader(fdLoc, mgr)
         this.ui.percent.text("(" + this.fileSvr.perSvr + ")");
         this.ui.msg.text("正在上传队列中等待...");
         this.State = this.Config.state.Ready;
+        this.ui.btn.cancel.click(function () {
+            _this.stop();
+            _this.remove();
+
+        });
+        this.ui.btn.post.click(function () {
+            _this.ui.btn.post.hide();
+            _this.ui.btn.del.hide();
+            _this.ui.btn.cancel.hide();
+            _this.ui.btn.stop.show();
+
+            if (!_this.manager.IsPostQueueFull()) {
+                _this.post();
+            }
+            else {
+                _this.ui.msg.text("正在上传队列中等待...");
+                _this.State = _this.Config.state.Ready;
+                $.each(_this.ui.btn, function (i, n) { n.hide(); });
+                _this.ui.btn.del.show();
+                _this.manager.AppendQueue(_this.fileSvr.id);
+            }
+        });
+        this.ui.btn.stop.click(function () {
+            _this.stop();
+        });
+        this.ui.btn.del.click(function () { _this.remove(); });
     };
     this.svr_create = function (fdSvr)
     {
@@ -87,10 +113,7 @@ function FolderUploader(fdLoc, mgr)
     //上传，创建文件夹结构信息
     this.post = function ()
     {
-        this.ui.btn.stop.show();
-        this.ui.btn.del.hide();
-        this.ui.btn.post.hide();
-        this.ui.btn.cancel.hide();
+        $.each(this.ui.btn, function (i, n) { n.hide();});
         this.manager.AppendQueuePost(this.id);//添加到队列中
         this.State = this.Config.state.Posting;
         //如果文件夹已初始化，表示续传。
@@ -159,8 +182,6 @@ function FolderUploader(fdLoc, mgr)
     };
     this.post_fd = function ()
     {
-        this.ui.btn.stop.show();
-        this.ui.btn.post.hide();
         this.State = this.Config.state.Posting;
         var fd = jQuery.extend({}, { id: this.id, pathLoc: this.fileSvr.pathLoc, fields: this.fields });
         this.app.postFolder(fd);
@@ -211,6 +232,7 @@ function FolderUploader(fdLoc, mgr)
     };
     this.post_process = function (json)
     {
+        this.ui.btn.stop.show();
         this.fileSvr.lenSvr = json.lenSvr;
         this.fileSvr.perSvr = json.percent;
         this.ui.percent.text("(" + json.percent+")");
@@ -375,7 +397,7 @@ function FolderUploader(fdLoc, mgr)
         this.manager.del_file(this.fileSvr.id);
         this.app.delFolder({ id: this.id });
         this.manager.Delete(this.id);
-        this.svr_remove();
+        if (this.State != this.Config.state.Complete) this.svr_remove();
         this.ui.div.remove();
     };
 }
