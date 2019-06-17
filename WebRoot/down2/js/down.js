@@ -193,7 +193,7 @@ function DownloaderMgr()
 						<span class="toolbar-btn" name="btnSetFolder"><div>设置下载目录</div></span>\
 						<span class="toolbar-btn" name="btnStart">全部下载</span>\
 						<span class="toolbar-btn" name="btnStop">全部停止</span>\
-						<span class="toolbar-btn d-hide" name="btnSetup">安装控件</span>\
+						<span class="toolbar-btn" name="btnSetup">安装控件</span>\
 					</div>\
 					<div class="content" name="down_content">\
 						<div name="down_body" class="file-post-view"></div>\
