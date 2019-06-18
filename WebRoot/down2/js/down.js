@@ -123,6 +123,7 @@ function DownloaderMgr()
         , queueComplete: function () { }
 	};
 
+    this.websocketInited = false;
 	var browserName = navigator.userAgent.toLowerCase();
 	this.ie = browserName.indexOf("msie") > 0;
 	this.ie = this.ie ? this.ie : browserName.search(/(msie\s|trident.*rv:)([\w.]+)/) != -1;
@@ -425,6 +426,9 @@ function DownloaderMgr()
 	this.queue_begin = function (json) { this.working = true;};
 	this.queue_end = function (json) { this.working = false;};
     this.load_complete = function (json) {
+        if (this.websocketInited) return;
+        this.websocketInited = true;
+
         this.btnSetup.hide();
         var needUpdate = true;
         if (typeof (json.version) != "undefined") {
@@ -570,6 +574,7 @@ function DownloaderMgr()
 
 	    //设置下载文件夹
         btnSetFolder.click(function () { _this.open_folder(); });
+        this.btnSetup.click(function () { window.open(_this.Config.exe.path); });
 		//清除已完成
         ui.find(this.Config.ui.btn.clear).click(function () { _this.clearComplete(); }).hover(function () {
             $(this).addClass("btn-footer-hover");

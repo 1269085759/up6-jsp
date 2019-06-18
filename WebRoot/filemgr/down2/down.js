@@ -566,6 +566,7 @@ function DownloaderMgr()
 
 	    //设置下载文件夹
         btnSetFolder.click(function () { _this.open_folder(); });
+        this.btnSetup.click(function () { window.open(_this.Config.exe.path); });
 		//清除已完成
         ui.find(this.Config.ui.btn.clear).click(function () { _this.clearComplete(); });
 		ui.find('span[name="btnStart"]').click(function () { _this.start_queue(); });

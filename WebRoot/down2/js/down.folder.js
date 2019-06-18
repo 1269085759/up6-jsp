@@ -127,7 +127,7 @@
         this.app.stopFile({id:this.fileSvr.id});
         //从上传列表中删除
         this.ui.div.remove();
-        this.Manager.remove_url(this.fileSvr.f_id);
+        this.Manager.remove_url(this.fileSvr.id);
         this.svr_delete();
     };
 
