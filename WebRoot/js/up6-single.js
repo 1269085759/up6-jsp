@@ -689,11 +689,7 @@ function FileUploader(fileLoc, mgr)
         this.ui.btn.stop.show();
         this.ui.btn.cancel.hide();
         this.State = this.Config.state.Posting;//
-        var path_loc = this.fileSvr.pathLoc;
-        this.fields["pathSvr"] = encodeURIComponent(this.fileSvr.pathSvr);
-        this.fields["lenLoc"] = this.fileSvr.lenLoc;
-        this.fields["md5"] = this.fileSvr.md5;
-        this.app.postFile({ id: this.id, pathLoc: path_loc, lenSvr: this.fileSvr.lenSvr, folder: false, fields: this.fields });
+        this.app.postFile({ id: this.fileSvr.id, pathLoc: this.fileSvr.pathLoc,pathSvr:this.fileSvr.pathSvr, lenSvr: this.fileSvr.lenSvr, fields: this.fields });
     };
     this.check_file = function ()
     {
