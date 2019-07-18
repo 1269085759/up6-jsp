@@ -254,7 +254,7 @@ function HttpUploaderMgr()
 						<div name="post_body" class="files-list"></div>\
 					</div>\
 					<div class="files-toolbar" name="post_footer">\
-						<span class="tool-btn" name="btnClear"><img name="paste" src="js/16/clear.png"/>清除已完成</a>\
+						<span class="tool-btn" name="btnClear"><img name="paste" src="js/16/clear.png"/>清除已完成</span>\
 					</div>\
 				</div>';
         com += '</div>';

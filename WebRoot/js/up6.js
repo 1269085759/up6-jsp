@@ -464,7 +464,7 @@ function HttpUploaderMgr()
 						<div name="post_body" class="file-post-view"></div>\
 					</div>\
 					<div class="footer" name="post_footer">\
-						<span class="btn-footer" name="btnClear">清除已完成文件</a>\
+						<span class="btn-footer" name="btnClear">清除已完成文件</span>\
 					</div>\
 				</div>';
 		return acx;
