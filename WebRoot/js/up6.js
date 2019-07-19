@@ -90,6 +90,7 @@ function HttpUploaderMgr()
         , chrome: { name: "npHttpUploader6", type: "application/npHttpUploader6", path: "http://www.ncmem.com/download/up6.3/up6.crx" }
         , edge: {protocol:"up6",port:9100,visible:false}
         , exe: { path: "http://www.ncmem.com/download/up6.3/up6.exe" }
+        , mac: { path: "http://res2.ncmem.com/download/up6/pack/6.5.17/up6.pkg" }
 		, "SetupPath": "http://localhost:4955/demoAccess/js/setup.htm"
         , "Fields": {"uname": "test","upass": "test","uid":"0"}
         , ui: {
@@ -612,11 +613,16 @@ function HttpUploaderMgr()
 	this.checkBrowser = function ()
 	{
 	    //Win64
-	    if (window.navigator.platform == "Win64")
-	    {
-	        jQuery.extend(this.Config.ie, this.Config.ie64);
-	    }
-	    if (this.firefox)
+        if (window.navigator.platform == "Win64") {
+            jQuery.extend(this.Config.ie, this.Config.ie64);
+        }//macOS
+        else if (window.navigator.platform == "MacIntel") {
+            this.edge = true;
+            this.app.postMessage = this.app.postMessageEdge;
+            this.edgeApp.run = this.edgeApp.runChr;
+            this.Config.exe.path = this.Config.mac.path;
+        }
+	    else if (this.firefox)
 	    {
 	        if (!this.app.checkFF() || parseInt(this.ffVer[1]) >= 50)//仍然支持npapi
             {
