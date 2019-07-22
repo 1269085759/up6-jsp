@@ -59,7 +59,7 @@ function WebServerUp6(mgr)
                     _this.tryConnect = true;
                     _this.ent.on_close();//
                     _this.run();
-                    setTimeout(function () { _this.connect() }, 1000);//启动定时器
+                    setTimeout(function () { _this.connect() }, 3000);//启动定时器
                 }
             };
 
