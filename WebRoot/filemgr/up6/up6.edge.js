@@ -24,7 +24,7 @@ function WebServerUp6(mgr)
         }
     };
     this.runChr = function () {
-        var protocol = mgr.Config.edge.protocol + "://" + mgr.Config.edge.port;
+        var protocol = mgr.Config.edge.protocol + "://?port=" + mgr.Config.edge.port;
         var html = "<iframe id='up6-uri-fra' width=1 height=1 src='" + protocol + "'></iframe>";
         $("#up6-uri-fra").remove();
         $(document.body).append(html);
