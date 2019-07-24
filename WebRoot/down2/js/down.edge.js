@@ -67,7 +67,7 @@ function WebServerDown2(mgr)
         {
             _this.run();
             console.log("连接失败");
-            setTimeout(function () { _this.connect() }, 1000);//启动定时器
+            setTimeout(function () { _this.connect() }, 3000);//启动定时器
         };
     };
     this.close = function ()
