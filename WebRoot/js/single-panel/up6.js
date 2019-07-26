@@ -13,7 +13,7 @@
 	VC运行库：http://www.microsoft.com/en-us/download/details.aspx?id=29
 	联系信箱：1085617561@qq.com
 	联系QQ：1085617561
-    版本：2.3.7
+    版本：2.3.8
 	更新记录：
 		2009-11-05 创建。
 		2015-07-31 优化更新进度逻辑
@@ -98,6 +98,8 @@ function HttpUploaderMgr()
         , chrome: { name: "npHttpUploader6", type: "application/npHttpUploader6", path: "http://www.ncmem.com/download/up6.3/up6.crx" }
         , edge: {protocol:"up6",port:9100,visible:false}
         , exe: { path: "http://www.ncmem.com/download/up6.3/up6.exe" }
+        , mac: { path: "http://res2.ncmem.com/download/up6/pack/6.5.17/up6.pkg" }
+        , linux: { path: "http://res2.ncmem.com/download/up6/pack/6.5.17/setup.tar" }
 		, "SetupPath": "http://localhost:4955/demoAccess/js/setup.htm"
         , "Fields": { "uname": "test", "upass": "test", "uid": "0" }
         , errCode: {
@@ -439,8 +441,20 @@ function HttpUploaderMgr()
 	    if (window.navigator.platform == "Win64")
 	    {
 	        jQuery.extend(this.Config.ie, this.Config.ie64);
-	    }
-	    if (this.firefox)
+        }//macOS
+        else if (window.navigator.platform == "MacIntel") {
+            this.edge = true;
+            this.app.postMessage = this.app.postMessageEdge;
+            this.edgeApp.run = this.edgeApp.runChr;
+            this.Config.exe.path = this.Config.mac.path;
+        }
+        else if (window.navigator.platform == "Linux x86_64") {
+            this.edge = true;
+            this.app.postMessage = this.app.postMessageEdge;
+            this.edgeApp.run = this.edgeApp.runChr;
+            this.Config.exe.path = this.Config.linux.path;
+        }
+	    else if (this.firefox)
 	    {
 	        if (!this.app.checkFF() || parseInt(this.ffVer[1]) >= 50)//仍然支持npapi
             {
