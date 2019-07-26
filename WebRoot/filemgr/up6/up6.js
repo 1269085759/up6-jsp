@@ -71,7 +71,7 @@ function HttpUploaderMgr()
         , edge: {protocol:"up6",port:9100,visible:false}
         , exe: { path: "http://www.ncmem.com/download/up6.3/up6.exe" }
         , mac: { path: "http://res2.ncmem.com/download/up6/pack/6.5.17/up6.pkg" }
-        , linux: { path: "http://res2.ncmem.com/download/up6/pack/6.5.17/setup.sh" }
+        , linux: { path: "http://res2.ncmem.com/download/up6/pack/6.5.17/setup.tar" }
 		, "SetupPath": "http://localhost:4955/demoAccess/js/setup.htm"
         , "Fields": {"uname": "test","upass": "test","uid":"0"}
         , bizData: {pid:"",pidRoot:""}

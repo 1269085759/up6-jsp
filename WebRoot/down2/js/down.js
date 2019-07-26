@@ -56,7 +56,7 @@ function DownloaderMgr()
         , chrome45: { name: "com.xproer.down2", path: "http://www.ncmem.com/download/down2/2.4/down2.nat.crx" }
         , exe: { path: "http://www.ncmem.com/download/down2/2.4/down2.exe" }
         , mac: { path: "http://res2.ncmem.com/download/down2/pack/2.4.19/down2.pkg" }
-        , linux: { path: "http://res2.ncmem.com/download/down2/pack/2.4.19/down2.sh" }
+        , linux: { path: "http://res2.ncmem.com/download/down2/pack/2.4.19/down2.tar" }
         , edge: {protocol:"down2",port:9700,visible:false}
         , "Fields": { "uname": "test", "upass": "test", "uid": "0" }
         , errCode: {
