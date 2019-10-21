@@ -56,6 +56,7 @@ function HttpUploaderMgr()
 		, "AppPath"			: ""//网站虚拟目录名称。子文件夹 web
         , "Cookie"			: ""//服务器cookie
         , "Md5Folder"       : false//上传文件夹时是否计算子文件md5
+        , "IncludeHide"     : false//是否包含隐藏文件
         , "QueueCount"      : 3//同时上传的任务数
         , "Md5Thread"       : 10//最大为10
         , "FolderThread"    : 3//最大为10
