@@ -77,28 +77,38 @@ catch (FileUploadException e)
    
 }
 
-FileItem rangeFile = null;
+FileItem blockData = null;//文件块
+FileItem thumbData = null;//缩略图，与最后一个文件块一起上传。
 // 得到所有上传的文件
 Iterator fileItr = files.iterator();
 // 循环处理所有文件
 while (fileItr.hasNext()) 
 {
 	// 得到当前文件
-	rangeFile = (FileItem) fileItr.next();
+	FileItem rangeFile = (FileItem) fileItr.next();
 	if(StringUtils.equals( rangeFile.getFieldName(),"pathSvr"))
 	{
 		pathSvr = rangeFile.getString();
 		pathSvr = PathTool.url_decode(pathSvr);
+	}
+	else if(StringUtils.equals( rangeFile.getFieldName(),"thumb"))
+	{
+		thumbData = rangeFile;
+	}
+	else if(StringUtils.equals( rangeFile.getFieldName(),"file"))
+	{
+		blockData = rangeFile;
 	}
 }
 
 boolean verify = false;
 String msg = "";
 String md5Svr = "";
-long blockSizeSvr = rangeFile.getSize();
+long blockSizeSvr = blockData.getSize();
+
 if(!StringUtils.isBlank(blockMd5))
 {
-	md5Svr = Md5Tool.fileToMD5(rangeFile.getInputStream());
+	md5Svr = Md5Tool.fileToMD5(blockData.getInputStream());
 }
 
 verify = Integer.parseInt(blockSize) == blockSizeSvr;
@@ -119,8 +129,16 @@ if(verify)
 	FileBlockWriter res = new FileBlockWriter();
 	//仅第一块创建
 	if( Integer.parseInt(blockIndex)==1) res.CreateFile(pathSvr,Long.parseLong(lenLoc));
-	res.write( Long.parseLong(blockOffset),pathSvr,rangeFile);
+	res.write( Long.parseLong(blockOffset),pathSvr,blockData);
 	up6_biz_event.file_post_block(id,Integer.parseInt(blockIndex));
+	
+	//保存缩略图，最后一块
+	if(StringUtils.equals(complete, "true") && thumbData != null)
+	{
+		String thumbPath = pathSvr+".thumb.png";
+		res.CreateFile(thumbPath, thumbData.getSize());
+		res.write(0, thumbPath, thumbData);
+	}
 	
 	JSONObject o = new JSONObject();
 	o.put("msg", "ok");
@@ -128,6 +146,6 @@ if(verify)
 	o.put("offset", blockOffset);//基于文件的块偏移位置
 	msg = o.toString();
 }
-rangeFile.delete();
+blockData.delete();
 out.write(msg);
 %>
