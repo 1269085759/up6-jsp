@@ -48,20 +48,27 @@ public class PathTool {
 		return f.getCanonicalPath();
 	}
 	
-	public static String combine(String a,String b) throws IOException
+	public static String combine(String a,String b)
 	{
+		String path="";
+		File ps;
 		boolean split = a.endsWith("\\");
 		if(!split) split = a.endsWith("/");		
 		//没有斜杠
 		if(!split)
 		{
-			File ps = new File(a.concat("/").concat(b));
-			return ps.getCanonicalPath();
+			ps = new File(a.concat("/").concat(b));
 		}//有斜框
 		else{
-			File ps = new File(a.concat(b));
-			return ps.getCanonicalPath();
+			ps = new File(a.concat(b));
 		}
+		try {
+			path = ps.getCanonicalPath();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return path;
 	}
 	
 	public static String url_decode(String v)

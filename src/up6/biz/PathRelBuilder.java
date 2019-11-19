@@ -113,6 +113,11 @@ public class PathRelBuilder {
 
     /**
      * 为所有文件构建路径
+     * 格式：
+     * [
+     *   {nameLoc,pathSvr,pathRel,lenSvr,sizeSvr}
+     *   {nameLoc,pathSvr,pathRel,lenSvr,sizeSvr}
+     * ]
      * @return
      */
     JSONArray buildFile()

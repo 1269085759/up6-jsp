@@ -112,11 +112,45 @@ public class DbFolder
 
         return JSONArray.fromObject(psort);
     }
+    
+    public JSONArray build_path(JSONObject fdCur) {
+    	
+    	//查询文件表目录数据
+    	SqlExec se = new SqlExec();
+        JSONArray files = se.select("up6_files", "f_id,f_pid,f_nameLoc,f_pathRel", new SqlParam[] { new SqlParam("f_fdTask",true) },"");
+        JSONArray folders = se.select("up6_folders", "f_id,f_pid,f_nameLoc,f_pathRel", new SqlParam[] { },"");
+        String id = fdCur.getString("f_id").trim();//
+
+        //根目录
+        ArrayList<JSONObject> psort = new ArrayList<JSONObject>();
+        if (StringUtils.isBlank(id))
+        {
+            psort.add(0, this.root);
+
+            return JSONArray.fromObject(psort);
+        }
+
+        //构建目录映射表(id,folder)
+        Map<String, JSONObject> dtFiles = this.toDic(files);
+        Map<String, JSONObject> dtFolders = this.toDic(folders);
+        for(String key : dtFolders.keySet())
+        {
+        	if(!dtFiles.containsKey(key)) dtFiles.put(key, dtFolders.get(key));
+        }
+        
+        //按层级顺序排列目录
+        psort = this.sortByPid(dtFiles, id, psort);
+
+        
+        psort.add(0, this.root);
+
+        return JSONArray.fromObject(psort);
+    }
 	
 	public FileInf read(String id) {
         SqlExec se = new SqlExec();
-        String sql = String.format("select f_pid,f_pidRoot,f_pathSvr from up6_files where f_id='%s' union select f_pid,f_pidRoot,f_pathSvr from up6_folders where f_id='%s'", id,id);
-        JSONArray data = se.exec("up6_files", sql, "f_pid,f_pidRoot,f_pathSvr","");
+        String sql = String.format("select f_pid,f_pidRoot,f_pathSvr,f_pathRel from up6_files where f_id='%s' union select f_pid,f_pidRoot,f_pathSvr,f_pathRel from up6_folders where f_id='%s'", id,id);
+        JSONArray data = se.exec("up6_files", sql, "f_pid,f_pidRoot,f_pathSvr,f_pathRel","");
         JSONObject o = (JSONObject)data.get(0);
 
         FileInf file = new FileInf();
@@ -124,6 +158,7 @@ public class DbFolder
         file.pid = o.getString("f_pid").trim();
         file.pidRoot = o.getString("f_pidRoot").trim();
         file.pathSvr = o.getString("f_pathSvr").trim();
+        file.pathRel = o.getString("f_pathRel").trim();
         return file;
     }
 	

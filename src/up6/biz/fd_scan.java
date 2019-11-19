@@ -8,6 +8,7 @@ import java.sql.SQLException;
 import java.util.UUID;
 
 import up6.DbHelper;
+import up6.PathTool;
 import up6.model.FileInf;
 
 
@@ -135,9 +136,9 @@ public class fd_scan
 		}
 	}
 	
-	protected void GetAllFiles(FileInf inf,String root)
+	protected void GetAllFiles(FileInf parent,String root)
 	{
-		File dir = new File(inf.pathSvr); 
+		File dir = new File(parent.pathSvr); 
 		File [] allFile = dir.listFiles();
 		for(int i = 0; i < allFile.length; i++)
 		{
@@ -147,13 +148,14 @@ public class fd_scan
 				String uuid = UUID.randomUUID().toString();
 				uuid = uuid.replace("-", "");
 				fd.id = uuid;
-				fd.pid = inf.id;
+				fd.pid = parent.id;
 				fd.pidRoot = this.root.id;
 				fd.nameSvr = allFile[i].getName();
 				fd.nameLoc = fd.nameSvr;
 				fd.pathSvr = allFile[i].getPath();
 				fd.pathSvr = fd.pathSvr.replace("\\", "/");
 				fd.pathRel = fd.pathSvr.substring(root.length() + 1);
+				fd.pathRel = PathTool.combine(parent.pathRel, fd.pathRel);
 				fd.perSvr = "100%";
 				fd.complete = true;
 				this.save_folder(fd);
@@ -166,13 +168,14 @@ public class fd_scan
 				String uuid = UUID.randomUUID().toString();
 				uuid = uuid.replace("-", "");
 				fl.id = uuid;
-				fl.pid = inf.id;
+				fl.pid = parent.id;
 				fl.pidRoot = this.root.id;
 				fl.nameSvr = allFile[i].getName();
 				fl.nameLoc = fl.nameSvr;
 				fl.pathSvr = allFile[i].getPath();
 				fl.pathSvr = fl.pathSvr.replace("\\", "/");
 				fl.pathRel = fl.pathSvr.substring(root.length() + 1);
+				fl.pathRel = PathTool.combine(parent.pathRel, fl.pathRel);
 				fl.lenSvr = allFile[i].length();
 				fl.lenLoc = fl.lenSvr;
 				fl.perSvr = "100%";

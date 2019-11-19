@@ -340,8 +340,8 @@ function FolderUploader(fdLoc, mgr)
         }
         //在此处增加服务器验证代码。
         this.ui.msg.text("初始化...");
-        $.extend(this.fileSvr, this.Config.bizData);
-        var param = jQuery.extend({}, this.fields,this.Config.bizData, {
+        //$.extend(this.fileSvr, this.Config.bizData);
+        var param = jQuery.extend({}, this.fields, {
             id: this.fileSvr.id,
             lenLoc: this.fileSvr.lenLoc,
             sizeLoc: this.fileSvr.sizeLoc,

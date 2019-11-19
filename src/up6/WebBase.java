@@ -64,6 +64,35 @@ public class WebBase {
 
     }
     
+    public JSONObject request_to_json() 
+    {
+    	JSONObject o = new JSONObject();
+    	ServletRequest req = (HttpServletRequest) this.m_pc.getRequest();
+    	Enumeration paramNames = req.getParameterNames();
+    	
+    	  while (paramNames.hasMoreElements()) {
+    	   String paramName = (String) paramNames.nextElement();
+    	   
+    	   String[] paramValues = req.getParameterValues(paramName);
+    	   if (paramValues.length == 1) {
+    	    String paramValue = paramValues[0];
+    	    if (paramValue.length() != 0) {
+    	     //System.out.println("参数：" + paramName + "=" + paramValue);
+    	    paramValue = paramValue.trim();
+    	    	o.put(paramName, paramValue);
+    	    }
+    	   }
+    	  }
+    	  
+    	return o;
+    }
+    
+    public String reqToString(String name) 
+    {
+    	String v = this.queryString(name);
+    	return v;
+    }
+    
     public Object path(String name)
     {
     	return this.m_path.get(name);

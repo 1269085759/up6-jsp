@@ -45,6 +45,12 @@ public class SqlExec {
     	db.ExecuteNonQuery(cmd);
     }
     
+    public void exec(String sql)
+    {
+    	DbHelper db = new DbHelper();
+		db.ExecuteNonQuery(sql);
+    }
+    
     public JSONArray exec(String table,String sql,String fields,String newNames)
     {
     	this.m_table = this.table(table);

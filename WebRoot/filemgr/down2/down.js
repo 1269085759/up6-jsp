@@ -480,7 +480,7 @@ function DownloaderMgr()
         }
 	    else if (this.firefox)
         {
-            if (!this.app.checkFF())//仍然支持npapi
+            //if (!this.app.checkFF())//仍然支持npapi
             {
                 this.edge = true;
                 this.app.postMessage = this.app.postMessageEdge;
@@ -492,10 +492,10 @@ function DownloaderMgr()
 	        this.app.check = this.app.checkFF;
 	        jQuery.extend(this.Config.firefox, this.Config.chrome);
 	        //44+版本使用Native Message
-	        if (parseInt(this.chrVer[1]) >= 44)
+	        //if (parseInt(this.chrVer[1]) >= 44)
 	        {
-                _this.firefox = true;
-                if (!this.app.checkFF())//仍然支持npapi
+                //_this.firefox = true;
+                //if (!this.app.checkFF())//仍然支持npapi
                 {
                     this.edge = true;
                     this.app.postMessage = this.app.postMessageEdge;

@@ -157,7 +157,8 @@ function HttpUploaderMgr()
 	      "md5Complete": function (obj/*HttpUploader对象*/, md5) { }
         , "scanComplete": function (obj/*文件夹扫描完毕，参考：FolderUploader*/) { }
         , "fileComplete": function (obj/*文件上传完毕，参考：FileUploader*/) { }
-        , "fileAppend": function (/*文件和目录添加事件*/) { }
+        , "itemSelected": function (/*用户选择了文件或目录*/) { }
+        , "fileAppend": function (f) { /*文件和目录添加事件*/}
         , "fdComplete": function (obj/*文件夹上传完毕，参考：FolderUploader*/) { }
         , "queueComplete": function () {/*队列上传完毕*/ }
         , "loadComplete": function () {/*队列上传完毕*/ }
@@ -250,7 +251,7 @@ function HttpUploaderMgr()
         {
 	        this.addFileLoc(json.files[i]);
         }
-        this.event.fileAppend();
+        this.event.itemSelected();
 	    setTimeout(function () { _this.PostFirst(); },500);
 	};
 	this.open_folders = function (json)
@@ -258,7 +259,7 @@ function HttpUploaderMgr()
         for (var i = 0, l = json.folders.length; i < l; ++i) {
             this.addFolderLoc(json.folders[i]);
         }
-        this.event.fileAppend();
+        this.event.itemSelected();
 	    setTimeout(function () { _this.PostFirst(); }, 500);
 	};
 	this.paste_files = function (json)
@@ -267,7 +268,9 @@ function HttpUploaderMgr()
 	    {
 	        this.addFileLoc(json.files[i]);
 	    }
-	};
+        this.event.itemSelected();
+	    setTimeout(function () { _this.PostFirst(); }, 500);
+    };
 	this.post_process = function (json)
 	{
 	    var p = this.filesMap[json.id];
@@ -390,7 +393,7 @@ function HttpUploaderMgr()
         }
 	    else if (this.firefox)
 	    {
-	        if (!this.app.checkFF() || parseInt(this.ffVer[1]) >= 50)//仍然支持npapi
+	        //if (!this.app.checkFF() || parseInt(this.ffVer[1]) >= 50)//仍然支持npapi
             {
                 this.edge = true;
                 this.app.postMessage = this.app.postMessageEdge;
@@ -402,10 +405,10 @@ function HttpUploaderMgr()
             this.app.check = this.app.checkFF;
 	        jQuery.extend(this.Config.firefox, this.Config.chrome);
 	        //44+版本使用Native Message
-	        if (parseInt(this.chrVer[1]) >= 44)
+	        //if (parseInt(this.chrVer[1]) >= 44)
 	        {
-	            _this.firefox = true;
-	            if (!this.app.checkFF())//仍然支持npapi
+	            //_this.firefox = true;
+	            //if (!this.app.checkFF())//仍然支持npapi
                 {
                     this.edge = true;
                     this.app.postMessage = this.app.postMessageEdge;
@@ -792,7 +795,8 @@ function HttpUploaderMgr()
 		ui.msg.text("");
 		ui.percent.text("(0%)");
 		
-		upFile.Ready(); //准备
+        upFile.Ready(); //准备
+        this.event.fileAppend(upFile);//触发事件
 		return upFile;
 	};
 
@@ -832,7 +836,8 @@ function HttpUploaderMgr()
 		this.filesMap[fdLoc.id] = fdTask;//添加到映射表
 		fdTask.ui = ui;
 		fdTask.Ready(); //准备
-		return fdTask;
+        this.event.fileAppend(fdTask);//触发事件
+        return fdTask;
 	};
 
 	this.ResumeFolder = function (fileSvr)

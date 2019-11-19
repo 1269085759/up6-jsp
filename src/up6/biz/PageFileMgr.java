@@ -53,8 +53,34 @@ public class PageFileMgr {
 		else if(StringUtils.equals("tree", op)) this.load_tree();
 		else if(StringUtils.equals("f_create", op)) this.f_create();
 		else if(StringUtils.equals("fd_create", op)) this.fd_create();
+		else if(StringUtils.equals("fd_data", op)) this.fd_data();
 	}
 
+	void fd_data()
+	{
+		String id		= this.m_wb.queryString("id");
+		String callback = this.m_wb.queryString("callback");
+		
+		if (StringUtils.isBlank(id))
+		{
+			this.m_wb.toContent(callback + "({\"value\":null})");	
+			return;
+		}
+		FolderBuilder fb = new FolderBuilder();
+		Gson gson = new Gson();
+		String json = gson.toJson(fb.build(id));
+		
+		try {
+			json = URLEncoder.encode(json,"UTF-8");
+		} catch (UnsupportedEncodingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}//编码，防止中文乱码
+		json = json.replace("+","%20");
+		json = callback + "({\"value\":\"" + json + "\"})";//返回jsonp格式数据。
+		this.m_wb.toContent(json);
+	}
+	
 	void f_create() 
 	{
 		String pid      = this.m_wb.queryString("pid");

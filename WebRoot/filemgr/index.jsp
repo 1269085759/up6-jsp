@@ -17,104 +17,139 @@ PageFileMgr pfm = new PageFileMgr(pageContext);
             , wb.m_path.get("res")+"filemgr.css"
             , wb.m_path.get("bootstrap")
             , wb.m_path.get("layerui")
-            , wb.m_path.get("jstree")
             , wb.m_path.get("moment")
             , wb.m_path.get("vue")
             , wb.m_path.get("up6")
             , wb.m_path.get("down2")
-            , wb.m_path.get("root")+"/filemgr/data/index.js"
-            , wb.m_path.get("res")+"layer.window.js"
+            , wb.m_path.get("root")+"/filemgr/data/vue-up6.js"
+            , wb.m_path.get("root")+"/filemgr/data/vue-down2.js"
+            , wb.m_path.get("root")+"/filemgr/data/vue-index.js"
     		) %>
 </head>
 <body>
-    <div class="container-fluid">
-	    <div class="row">
-	    	<div class="col-md-2">
-	            <div class="m-t-md">
-	                <div id="tree"></div>
-	            </div>    		
-	    	</div>
-	    	<div class="col-md-10">    		
-		        <div class="m-t-md clearfix">
-		            <button class="btn btn-default btn-sm pull-left m-r-xs" role="button" id="btn-up"><img name="up"/> 上传文件</button>
-		            <button class="btn btn-default btn-sm pull-left m-r-xs" role="button" id="btn-up-fd"><img name="up-fd"/> 上传目录</button>
-		            <button class="btn btn-default btn-sm pull-left m-r-xs" role="button" id="btn-up-paste"><img name="paste"/> 粘贴上传</button>
-                    <button class="btn btn-default btn-sm pull-left m-r-xs" role="button" id="btn-mk-folder"><img name="paste" />新建文件夹</button>
-		            <button class="btn btn-default btn-sm pull-left m-r-xs" role="button" id="btn-open-up"><img name="up-panel"/> 打开上传面板</button>
-		            <button class="btn btn-default btn-sm pull-left m-r-xs" role="button" id="btn-open-down"><img name="down-panel"/> 打开下载面板</button>
-		            <button class="btn btn-default btn-sm pull-left hide m-r-xs" role="button" id="btn-down"><img name="down"/> 下载</button>
-		            <button class="btn btn-default btn-sm pull-left hide" role="button" id="btn-del"><img name="del"/> 删除</button>
-		        </div>
-		        <div id="up6-panel" style="display:none;">
-		            <%= wb.template(wb.path("rootAbs")+"filemgr/data/ui-up.html") %>            
-		        </div>
-		        <div id="down2-panel" style="display:none;"><%=wb.template(wb.path("rootAbs")+"filemgr/data/ui-down.html") %></div>
-		        
-		        <!--路径导航-->
-		        <ol class="breadcrumb  m-t-xs" style="margin-bottom:-10px;" id="path">
-		            <li v-for="fd in folders">
-		                <a class="link" @click="open_folder(fd)">{{fd.f_nameLoc}}</a>
-		            </li>
-		        </ol>
-		        <table class="layui-hide" lay-size="sm" id="files" lay-filter="files" lay-skin="nob"></table>
-		        <script type="text/javascript">
-		        	var pageApp = new PageLogic();
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">说明：使用了vue,boostrap,layer组件，支持浏览器：ie9+,firefox,chrome</div>
+            </div>
+        <div class="row" id="app">
+            <div class="col-md-12">
+                <div class="m-t-md row">
+                    <div class="col-md-12">
+                    <button class="btn btn-default btn-sm m-r-xs" role="button" @click="btnUp_click">
+                        <img :src="ico.file" />
+                        上传文件</button>
+                    <button class="btn btn-default btn-sm m-r-xs" role="button" @click="btnUpFolder_click">
+                        <img :src="ico.btnUpFd" />
+                        上传目录</button>
+                    <button class="btn btn-default btn-sm m-r-xs" role="button" @click="btnPaste_click">
+                        <img :src="ico.btnPaste" />
+                        粘贴上传</button>
+                    <button class="btn btn-default btn-sm m-r-xs" role="button" @click="btnMkFolder_click">
+                        <img :src="ico.btnEdit" />
+                        新建文件夹</button>
+                    <button class="btn btn-default btn-sm m-r-xs" role="button" @click="openUp_click">
+                        <img :src="ico.btnPnlUp" />
+                        打开上传面板</button>
+                    <button class="btn btn-default btn-sm m-r-xs" role="button" @click="openDown_click">
+                        <img :src="ico.btnPnlDown" />
+                        打开下载面板</button>
+                    <button class="btn btn-default btn-sm m-r-xs" role="button" @click="btnDowns_click" v-show="idSels.length>0">
+                        <img :src="ico.btnDown" />
+                        批量下载</button>
+                    <button class="btn btn-default btn-sm hide" role="button" @click="">
+                        <img :src="ico.btnDel" />
+                        删除</button>
+                        </div>
+                </div>
+                <!--上传面板-->
+                <up6 id="pnl-up" ref="up6" style="display: none;" 
+                    :fd_create="url.fd_create"
+                    :f_create="url.f_create"
+                    :license="license.up6"
+                    @load_complete="up6_loadComplete"
+                    @item_selected="up6_itemSelected"
+                    @file_append="up6_fileAppend"
+                    @file_complete="up6_fileComplete"
+                    @folder_complete="up6_folderComplete"></up6>
+                <!--下载面板-->
+                <down2 id="pnl-down" ref="down" style="display: none;"
+                    :fd_data="url.fd_data"
+                    :license="license.down2"
+                    @load_complete="down_loadComplete"
+                    @same_file_exist="down_sameFileExist"></down2>
+                <!--路径导航-->
+                <ol class="breadcrumb  m-t-xs" style="margin-bottom: -5px;">
+                    <template v-for="p in pathNav">
+                    <li>
+                        <a class="link" @click="nav_click(p)">{{p.f_nameLoc}}</a>
+                    </li>
+                </template>
+                </ol>
+                <!--文件列表-->
+                <table class="table table-hover table-condensed">
+                    <thead>
+                        <tr>
+                            <th style="width:20px"></th>
+                            <th style="width:50%;"><input type="checkbox" @change="selAll_click" v-model="idSelAll" />名称</th>
+                            <th>编辑</th>
+                            <th>大小</th>
+                            <th>上传时间</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr v-show="folderMker.edit">
+                            <td></td>
+                            <td>
+                                <input class="form-control input-sm" style="width:80%;float:left;" v-model="folderMker.name" ref="tbFdName" @keyup.enter="btnMkFdOk_click"/>
+                                <a class="btn btn-default btn-sm m-l-xs" @click="btnMkFdOk_click"><img :src="ico.ok"/></a>
+                                <a class="btn btn-default btn-sm" @click="btnMkFdCancel_click"><img :src="ico.cancel"/></a>
+                                    </td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                        <tr v-for="(f,index) in items">
+                            <td>{{index+1}}</td>
+                            <td>
+                                <div :name="'v'+index">
+                                <input type="checkbox" :value="f.f_id" v-model="idSels" :name="'ckb'+index"/>
+                                <img :src="ico.file" v-show="!f.f_fdTask" :name="'name'+index"/>
+                                <img :src="ico.folder" v-show="f.f_fdTask"/>
+                                <a @click="open_folder(f)" class="link m-l-xs" :name="'name'+index">{{f.f_nameLoc}}</a>
+                                    </div>
+                                <div :name="'edit'+index" style="display:none;">
+                                <input class="form-control input-sm" style="width:80%;float:left;" :value="f.f_nameLoc" :name="'name'+index" @keyup.enter="btnRename_ok(f,index)"/>
+                                <a class="btn btn-default btn-sm m-l-xs" @click="btnRename_ok(f,index)"><img :src="ico.ok"/></a>
+                                <a class="btn btn-default btn-sm"  @click="btnRename_cancel(f,index)"><img :src="ico.cancel"/></a>
+                                    </div>
+                            </td>
+                            <td>
+                                <a class="m-r-md link" @click="itemRename_click(f,index)"><img :src="ico.btnEdit"/>重命名</a>
+                                <a class="m-r-md link" @click="itemDown_click(f)"><img :src="ico.btnDown"/>下载</a>
+                                <a class=" link" @click="btnDel_click(f)"><img :src="ico.btnDel"/>删除</a>
+                            </td>
+                            <td>{{f.f_sizeLoc}}</td>
+                            <td>{{tm_format(f.f_time)}}</td>
+                        </tr>
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <td colspan="5">
+                                <div id="pager"></div>
+                            </td>
+                        </tr>
+                    </tfoot>
+                </table>
+                <script type="text/javascript">
+                    layui.use(['layer'], function () {
+                        window.layer = layui.layer;
+                    });
 
-		        	//JavaScript代码区域
-		            layui.use(['element', 'table','laytpl'], function () {
-		                var element = layui.element, table = layui.table,laytpl = layui.laytpl;
-		                pageApp.attr.ui.table = table;
-		
-		                //js-module
-		                table.render({
-		                    elem: '#files'
-		                    , id: 'files'
-		                    , defaultToolbar: []//关闭过滤，打印按钮
-		                    , size: 'sm'
-		                    , height: 'full'//高度,full, 
-		                    , url: 'index.jsp?op=data&time='+(new Date().getTime())
-		                    , limit: 20//每页显示的条数，默认10
-		                    , page: true //开启分页
-		                    , cols: [[ //表头
-		                        { width: 50, sort: false, type: 'numbers' }
-		                        , { field: 'f_id', title: '', width: 50, sort: false, type: 'checkbox' }
-		                        , {
-		                            field: 'f_nameLoc', title: '名称', width: 500, sort: false, templet: function (d) {
-                                        var tmp = '<img src="{{d.img}}"/> <a class="link" lay-event="file">{{d.f_nameLoc}}</a>';
-                                        var par = $.extend(d, { img: page.path.res + "imgs/16/file.png" });
-                                        if (d.f_fdTask) par.img = page.path.res + "imgs/16/folder.png";
-                                        var str = laytpl(tmp).render(par);
-                                        return str;
-		                            }
-		                        }
-		                        , {
-                                    field: 'f_sizeLoc', title: '大小', width: 80, sort: false, templet: function (d) { if (d.f_fdTask) return ""; else return d.f_sizeLoc;}
-                                }
-		                        , { field: 'f_time', title: '上传时间', width:150, templet: function (d) { return moment(d.f_time).format('YYYY-MM-DD HH:mm:ss') } }
-		                        , { title: '编辑', templet: function (d) { 
-		                        	var str =  laytpl('<a class="layui-table-link link m-r-md" lay-event="rename"><img src="{{d.edit}}"/>重命名</a><a class="layui-table-link link m-r-md" lay-event="down"><img src="{{d.down}}"/>下载</a><a class="layui-table-link link" lay-event="delete"><img src="{{d.del}}"/>删除</a>').render({edit:page.path.res+'imgs/16/edit.png',del:page.path.res+"imgs/16/del.png",down:page.path.res+"imgs/16/down.png"});
-		                        	return str;
-		                        	} }
-		                    ]],
-		                    done: function (res, curr, count) { }
-		                });
-		
-		                table.on('tool(files)', function (obj) { pageApp.attr.event.table_tool_click(obj, table);});
-		
-		                //工具栏
-		                table.on('toolbar(files)', function (obj) { pageApp.attr.event.table_tool_click(obj, table); });
-		
-		                //复选框
-		                table.on('checkbox(files)', function (obj) { pageApp.attr.event.table_check_change(obj, table); });
-		                table.on('edit(files)', function (obj) { pageApp.attr.event.table_edit(obj); });
-		                pageApp.attr.ui.table = table;
-		            });
-		
-		            window.onbeforeunload = function (event) { return confirm("确定离开此页面吗？"); }
-		            window.unload = function (event) { pageApp.page_close(); };
-		        </script>
-	    	</div>
-	    </div>
+                    window.onbeforeunload = function (event) {  }
+                    window.unload = function (event) { pageApp.page_close(); };
+                </script>
+                </div>
+        </div>
     </div>
 </body>
 </html>

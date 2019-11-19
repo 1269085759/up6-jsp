@@ -250,7 +250,7 @@ function FileUploader(fileLoc, mgr)
         var loc_path = encodeURIComponent(this.fileSvr.pathLoc);
         var loc_len = this.fileSvr.lenLoc;
         var loc_size = this.fileSvr.sizeLoc;
-        var param = jQuery.extend({}, this.fields, this.Config.bizData, { md5: json.md5, id: this.fileSvr.id, lenLoc: loc_len, sizeLoc: loc_size, pathLoc: loc_path, time: new Date().getTime() });
+        var param = jQuery.extend({}, this.fields, { md5: json.md5, id: this.fileSvr.id, lenLoc: loc_len, sizeLoc: loc_size, pathLoc: loc_path, time: new Date().getTime() });
 
         $.ajax({
             type: "GET"
