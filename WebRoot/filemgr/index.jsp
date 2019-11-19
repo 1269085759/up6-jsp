@@ -128,7 +128,7 @@ PageFileMgr pfm = new PageFileMgr(pageContext);
                                 <a class="m-r-md link" @click="itemDown_click(f)"><img :src="ico.btnDown"/>下载</a>
                                 <a class=" link" @click="btnDel_click(f)"><img :src="ico.btnDel"/>删除</a>
                             </td>
-                            <td>{{f.f_sizeLoc}}</td>
+                            <td>{{f.f_fdTask?"":f.f_sizeLoc}}</td>
                             <td>{{tm_format(f.f_time)}}</td>
                         </tr>
                     </tbody>
