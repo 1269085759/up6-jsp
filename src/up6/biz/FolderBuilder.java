@@ -9,13 +9,19 @@ import up6.sql.SqlParam;
  * 构建文件夹下载数据
  * 格式：
  * [
- *   {nameLoc,pathSvr,pathRel,lenSvr,sizeSvr}
- *   {nameLoc,pathSvr,pathRel,lenSvr,sizeSvr}
+ *   {f_id,nameLoc,pathSvr,pathRel,lenSvr,sizeSvr}
+ *   {f_id,nameLoc,pathSvr,pathRel,lenSvr,sizeSvr}
  * ]
  * @author zysoft
  *
  */
 public class FolderBuilder {
+	
+	/**
+	 * 
+	 * @param id 文件夹ID
+	 * @return
+	 */
 	public JSONArray build(String id) 
 	{
 		SqlExec se = new SqlExec();
@@ -39,7 +45,12 @@ public class FolderBuilder {
         	JSONObject f = (JSONObject)files.get(i);
             String pathRel = f.getString("f_pathRel");
             pathRel = pathRel.substring(index);
-            f.put("f_pathRel", pathRel);            
+            
+            f.put("f_id", f.getString("f_id"));
+            f.put("nameLoc", f.getString("f_nameLoc"));
+            f.put("pathSvr", f.getString("f_pathSvr"));
+            f.put("lenSvr", f.getString("f_lenSvr"));                        
+            f.put("pathRel", pathRel);
         }
         
         return files;
