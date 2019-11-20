@@ -17,6 +17,11 @@ public class PathTool {
 		File f = new File(n);
 		return f.getName();
 	}
+	
+	public static String guid(){
+		return UUID.randomUUID().toString().replace("-","");
+	}
+	
 	public static String getExtention(String n){
 		String name = getName(n);
 
@@ -51,25 +56,16 @@ public class PathTool {
 	
 	public static String combine(String a,String b)
 	{
-		String path="";
-		File ps;
 		boolean split = a.endsWith("\\");
 		if(!split) split = a.endsWith("/");		
 		//没有斜杠
 		if(!split)
 		{
-			ps = new File(a.concat("/").concat(b));
+			return a.concat("/").concat(b);
 		}//有斜框
 		else{
-			ps = new File(a.concat(b));
-		}
-		try {
-			path = ps.getCanonicalPath();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		return path;
+			return a.concat(b);
+		}		
 	}
 	
 	public static String url_decode(String v)

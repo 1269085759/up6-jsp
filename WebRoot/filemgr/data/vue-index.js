@@ -76,9 +76,9 @@
 
                 var param = $.extend({}, {
                     f_pid: this.pathCur.f_id
-                    , f_pathRel: this.pathCur.f_pathRel
+                    , f_pathRel: encodeURIComponent(this.pathCur.f_pathRel)
                     , f_pidRoot: ""
-                    , f_nameLoc: this.folderMker.name
+                    , f_nameLoc: encodeURIComponent(this.folderMker.name)
                 });
 
                 $.ajax({

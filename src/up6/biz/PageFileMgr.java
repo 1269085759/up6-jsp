@@ -271,16 +271,14 @@ public class PageFileMgr {
 
     void mk_folder()
     {
-        String data = this.m_wb.queryString("data");
-        data = PathTool.url_decode(data);
-        JSONObject obj = JSONObject.fromObject( data );
-        String name = obj.getString("f_nameLoc").trim();
-        String pid = obj.getString("f_pid".trim());
-        String pidRoot = obj.getString("f_pidRoot").trim();
-        obj.put("f_nameLoc", name);
-        obj.put("f_pid", pid);
-        obj.put("f_pidRoot", pidRoot);
-
+        String name = this.m_wb.reqToString("f_nameLoc");
+        name = PathTool.url_decode(name);
+        String pid = this.m_wb.reqToString("f_pid");
+        String pidRoot = this.m_wb.reqToString("f_pidRoot");
+        String pathRel = this.m_wb.reqToString("f_pathRel");
+        pathRel = PathTool.url_decode(pathRel);
+        pathRel = PathTool.combine(pathRel, name);
+        
         DbFolder df = new DbFolder();
         if (df.exist_same_folder(name, pid))
         {
@@ -292,37 +290,37 @@ public class PageFileMgr {
         }
 
         SqlExec se = new SqlExec();
-    	String guid = UUID.randomUUID().toString().replace("-","");
+    	String guid = PathTool.guid();
     	
         //根目录
         if ( StringUtils.isBlank(pid) )
-        {             
-            obj.put("f_id", guid);
-
+        {
             se.insert("up6_files", new SqlParam[] {
                 new SqlParam("f_id",guid)
-                ,new SqlParam("f_pid",obj.getString("f_pid") )
-                ,new SqlParam("f_pidRoot",obj.getString("f_pidRoot") )
-                ,new SqlParam("f_nameLoc",obj.getString("f_nameLoc") )
+                ,new SqlParam("f_pid",pid )
+                ,new SqlParam("f_pidRoot",pidRoot )
+                ,new SqlParam("f_nameLoc",name )
                 ,new SqlParam("f_complete",true)
                 ,new SqlParam("f_fdTask",true)
+                ,new SqlParam("f_pathRel",pathRel)
             });
         }//子目录
         else
         {
-            obj.put("f_id",guid);
             se.insert("up6_folders"
                 , new SqlParam[] {
                 new SqlParam("f_id",guid)
-                ,new SqlParam("f_pid",obj.getString( "f_pid" ))
-                ,new SqlParam("f_pidRoot",obj.getString( "f_pidRoot" ) )
-                ,new SqlParam("f_nameLoc",obj.getString( "f_nameLoc" ) )
+                ,new SqlParam("f_pid",pid)
+                ,new SqlParam("f_pidRoot",pidRoot )
+                ,new SqlParam("f_nameLoc",name )
                 ,new SqlParam("f_complete",true)
+                ,new SqlParam("f_pathRel",pathRel)
                 });
         }
 
-        obj.put("ret", true);
-        this.m_wb.toContent(obj);
+        JSONObject ret = new JSONObject();
+        ret.put("ret", true);
+        this.m_wb.toContent(ret);
     }
     
     void build_path()

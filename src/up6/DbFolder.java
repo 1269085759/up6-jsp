@@ -187,7 +187,7 @@ public class DbFolder
         SqlWhereMerge swm = new SqlWhereMerge();
         swm.equal("f_nameLoc", name.trim());
         swm.equal("f_deleted", 0);
-        swm.equal("LTRIM (f_pid)", pid.trim());
+        swm.equal("f_pid", pid.trim());
         String where = swm.to_sql();
 
         String sql = String.format("(select f_id from up6_files where %s ) union (select f_id from up6_folders where %s)", where,where);
