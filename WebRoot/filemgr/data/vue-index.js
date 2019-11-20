@@ -339,7 +339,7 @@
             }
             , up6_fileAppend: function (f) {
                 //为文件设置当前位置
-                $.extend(f.fields, { pid: this.pathCur.f_id, pidRoot: "",pathRel:this.pathCur.f_pathRel });
+                $.extend(f.fields, { pid: this.pathCur.f_id, pidRoot: "",pathRel:encodeURIComponent(this.pathCur.f_pathRel) });
             }
             , up6_fileComplete: function (f) {
                 this.page_changed(1, 20);
