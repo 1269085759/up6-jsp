@@ -276,6 +276,13 @@ public class SqlExec {
     	return StringUtils.join(s, ",");    	
     }
     
+    /**
+     * 
+     * @param table
+     * @param fields
+     * @param ps
+     * @return 没有读取到数据时返回null
+     */
     public JSONObject read(String table,String fields,SqlParam[] ps) 
     {
     	this.m_table = this.table(table);
