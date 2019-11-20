@@ -156,7 +156,8 @@ public class fd_scan
 				fd.pathSvr = allFile[i].getPath();
 				fd.pathSvr = fd.pathSvr.replace("\\", "/");
 				fd.pathRel = fd.pathSvr.substring(root.length() + 1);
-				fd.pathRel = PathTool.combine(parent.pathRel, fd.pathRel);
+				fd.pathRel = PathTool.combine(parent.pathRel, fd.nameLoc);
+				System.out.println("文件夹相对路径：".concat(fd.pathRel));
 				fd.perSvr = "100%";
 				fd.complete = true;
 				this.save_folder(fd);
@@ -176,7 +177,8 @@ public class fd_scan
 				fl.pathSvr = allFile[i].getPath();
 				fl.pathSvr = fl.pathSvr.replace("\\", "/");
 				fl.pathRel = fl.pathSvr.substring(root.length() + 1);
-				fl.pathRel = PathTool.combine(parent.pathRel, fl.pathRel);
+				fl.pathRel = PathTool.combine(parent.pathRel, fl.nameLoc);
+				System.out.println("文件相对路径：".concat(fl.pathRel));
 				fl.lenSvr = allFile[i].length();
 				fl.lenLoc = fl.lenSvr;
 				fl.sizeLoc = PathTool.BytesToString(fl.lenLoc);
