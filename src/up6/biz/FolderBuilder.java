@@ -29,7 +29,6 @@ public class FolderBuilder {
 		String pathRoot = o.getString("f_pathRel");
 		int index = pathRoot.length();
 
-        JSONArray arr = new JSONArray();
         
         //查询文件
         String where = String.format("CHARINDEX('%s',f_pathRel)>0 and f_fdTask=0", pathRoot+"/");
@@ -40,10 +39,9 @@ public class FolderBuilder {
         	JSONObject f = (JSONObject)files.get(i);
             String pathRel = f.getString("f_pathRel");
             pathRel = pathRel.substring(index);
-            f.put("f_pathRel", pathRel);
-            arr.add(f);
+            f.put("f_pathRel", pathRel);            
         }
         
-        return arr;
+        return files;
 	}
 }
