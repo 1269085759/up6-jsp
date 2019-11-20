@@ -94,6 +94,8 @@ public class PageFileMgr {
 		String callback = this.m_wb.queryString("callback");
 		String pathLoc	= this.m_wb.queryString("pathLoc");
 		pathLoc			= PathTool.url_decode(pathLoc);
+		String pathRel  = this.m_wb.queryString("pathRel");
+		pathRel = PathTool.url_decode(pathRel);
 		
 		//参数为空
 		if (	StringUtils.isBlank(md5)
@@ -112,6 +114,7 @@ public class PageFileMgr {
 		fileSvr.uid = Integer.parseInt(uid);
 		fileSvr.nameLoc = PathTool.getName(pathLoc);
 		fileSvr.pathLoc = pathLoc;
+		fileSvr.pathRel = PathTool.combine(pathRel, fileSvr.nameLoc);
 		fileSvr.lenLoc = Long.parseLong(lenLoc);
 		fileSvr.sizeLoc = sizeLoc;
 		fileSvr.deleted = false;
@@ -189,12 +192,9 @@ public class PageFileMgr {
 		String lenLoc   = this.m_wb.queryString("lenLoc");
 		String sizeLoc  = this.m_wb.queryString("sizeLoc");
 		String pathLoc  = this.m_wb.queryString("pathLoc");
-		try {
-			pathLoc         = URLDecoder.decode(pathLoc,"UTF-8");
-		} catch (UnsupportedEncodingException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}//utf-8解码
+		String pathRel  = this.m_wb.queryString("pathRel");
+		pathRel 		= PathTool.url_decode(pathRel);
+		pathLoc			= PathTool.url_decode(pathLoc);		
 		String callback = this.m_wb.queryString("callback");//jsonp
 		
 		
@@ -216,6 +216,7 @@ public class PageFileMgr {
 		fileSvr.uid     = Integer.parseInt(uid);
 		fileSvr.nameLoc = PathTool.getName(pathLoc);
 		fileSvr.pathLoc = pathLoc;
+		fileSvr.pathRel = PathTool.combine(pathRel, fileSvr.nameLoc);
 		fileSvr.lenLoc  = Long.parseLong(lenLoc);
 		fileSvr.sizeLoc = sizeLoc;
 		fileSvr.deleted = false;
