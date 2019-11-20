@@ -2,6 +2,7 @@ package up6.biz;
 
 import java.io.File;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -178,6 +179,7 @@ public class fd_scan
 				fl.pathRel = PathTool.combine(parent.pathRel, fl.pathRel);
 				fl.lenSvr = allFile[i].length();
 				fl.lenLoc = fl.lenSvr;
+				fl.sizeLoc = PathTool.BytesToString(fl.lenLoc);
 				fl.perSvr = "100%";
 				fl.complete = true;
 				this.save_file(fl);

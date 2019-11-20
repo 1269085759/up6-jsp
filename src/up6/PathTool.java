@@ -3,6 +3,7 @@ package up6;
 import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.math.BigDecimal;
 import java.net.URLDecoder;
 import java.util.UUID;
 
@@ -139,5 +140,18 @@ public class PathTool {
 			e.printStackTrace();
 		}//取规范化的路径。
 		return path;
+	}
+
+	
+	public static String BytesToString(long byteCount)
+	{
+	    String[] suf = { "B", "KB", "MB", "GB", "TB", "PB", "EB" };
+	    if (byteCount == 0)
+	        return "0" + suf[0];
+	    long bytes = Math.abs(byteCount);
+	    int place = (new Double(Math.floor(Math.log(bytes) / Math.log(1024))).intValue());
+	    double num = (double)bytes / Math.pow(1024, place);
+	    num = new BigDecimal(num).setScale(1, BigDecimal.ROUND_HALF_UP).doubleValue();
+	    return String.valueOf( (Math.signum(byteCount) * num) ) + suf[place];
 	}
 }
