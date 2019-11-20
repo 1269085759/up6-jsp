@@ -68,7 +68,7 @@
                 this.folderMker.edit = true;
             }
             , btnMkFdOk_click: function () {
-                this.folderMker.name = this.folderMker.name.replace(/\s+/g, "");
+                this.folderMker.name = this.folderMker.name.replace(/^\s*|\s*$/gi, "");
                 if (this.folderMker.name.length<1) {
                     layer.alert('文件夹名称不能为空！,', { icon: 2 });
                     return;
